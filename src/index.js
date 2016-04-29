@@ -16,12 +16,9 @@ import {
   view,
 } from 'ramda';
 
-const emptyString = always('');
 const emptyObject = always({});
-const emptyArray = always([]);
 const getPropOrEmptyObjectFunction = propOr(emptyObject);
 const getPropOrEmptyString = propOr('');
-const firstArgument = nthArg(0);
 const secondArgument = nthArg(1);
 
 /*
