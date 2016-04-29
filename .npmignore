@@ -1,0 +1,9 @@
+# Source dir
+src
+
+# Config files
+.babelrc
+.gitignore
+.jsbeautifyrc
+LICENSE
+webpack.config.js
