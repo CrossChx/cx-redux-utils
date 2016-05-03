@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "license": "ISC",
   "description": "Tools for accommodating a specific redux pattern",
-  "main": "src/index.js",
+  "main": "lib/index.js",
   "repository": {
     "type": "git"
   },
