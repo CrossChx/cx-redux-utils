@@ -1,10 +1,11 @@
 import { expect } from 'chai';
 import {
-  createReducer,
   createAction,
+  createReducer,
   createSelector,
   createSetter,
   fetchCallback,
+  getTicket,
 } from '../src/index';
 
 import {
@@ -20,6 +21,23 @@ import {
   shouldNotThrow,
 } from 'how-the-test-was-won';
 
+const runErrorCases = callback => {
+  describe('an undefined argument', () => {
+    shouldThrow(callback, undefined, TypeError);
+  });
+
+  describe('a null argument', () => {
+    shouldThrow(callback, null, TypeError);
+  });
+
+  describe('an empty object', () => {
+    shouldNotThrow(callback, {});
+  });
+
+  describe('an empty array', () => {
+    shouldNotThrow(callback, []);
+  });
+};
 
 describe('Redux Utils', () => {
   const TEST_ACTION_TYPE = 'TEST_ACTION_TYPE';
@@ -332,15 +350,37 @@ describe('Redux Utils', () => {
       });
     });
 
+    describe('#getTicket', () => {
+      const ticketVal = 'thisIsTheFreakingTicket';
+      const result = getTicket(`?param1=val1&param2=val2&ticket=${ticketVal}`);
+      const expected = { ticket: ticketVal };
+
+      testIfExists(result);
+      shouldBeAnObject(result);
+
+      it('should return the expected ticket value', () => {
+        expect(result).to.deep.equal(expected);
+      });
+    });
+
     describe('#fetchCallback', () => {
       const target = 'i am the one you seek';
-      const append = '| i found you';
-      const expected = `${target} ${append}`;
-      const response = {
-        value: { data: target },
+      const url = 'http://www.testy-pants.com';
+      const okResponse = {
+        value: '{"data":"i am the one you seek"}',
+        status: 200,
       };
 
-      const testFetchHandler = data => `${data} ${append}`;
+      const noAuthResponse = {
+        value: '{"data":"i am the one you seek"}',
+        headers: {
+          get(prop) {
+            return prop === 'location' ? url : '';
+          },
+        },
+        status: 401,
+      };
+      const testFetchHandler = data => data;
 
       describe('when passed a valid callback to handle response data', () => {
         const callback = fetchCallback(testFetchHandler);
@@ -349,30 +389,30 @@ describe('Redux Utils', () => {
         shouldBeAFunction(callback);
 
         describe('when the resulting function is passed', () => {
-          describe('an undefined argument', () => {
-            shouldNotThrow(callback, undefined);
-          });
-
-          describe('a null argument', () => {
-            shouldNotThrow(callback, null);
-          });
-
-          describe('an empty object', () => {
-            shouldNotThrow(callback, {});
-          });
-
-          describe('an empty array', () => {
-            shouldNotThrow(callback, []);
-          });
+          runErrorCases(callback);
 
           describe('a valid response object', () => {
-            const result = callback(response);
+            const result = callback(okResponse);
 
-            shouldNotThrow(callback, response);
+            shouldNotThrow(callback, okResponse);
             testIfExists(result);
             shouldBeAString(result);
             it('should correctly return the target property and process it', () => {
-              expect(result).to.equal(expected);
+              expect(result).to.equal(target);
+            });
+          });
+
+          describe('a 401 response object with location header', () => {
+            const result = callback(noAuthResponse);
+
+            testIfExists(result);
+            shouldBeAnObject(result);
+            it('should have a redirect_to key', () => {
+              expect(result).to.have.all.keys('redirect_to');
+            });
+
+            it('should return the expected result', () => {
+              expect(result).to.deep.equal({ redirect_to: url });
             });
           });
         });

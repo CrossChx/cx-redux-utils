@@ -3,15 +3,24 @@ import {
   compose,
   cond,
   equals,
-  ifElse, isArrayLike,
+  find,
+  fromPairs,
+  ifElse,
+  isArrayLike,
   lensPath,
   lensProp,
   memoize,
-  merge, mergeAll,
+  merge,
+  mergeAll,
   nthArg,
+  objOf,
+  of,
+  propEq,
   propOr,
   set,
+  split,
   T,
+  test,
   type,
   view,
 } from 'ramda';
@@ -137,8 +146,38 @@ export const createSelector = compose(memoize, view, getLens);
  */
 export const createSetter = compose(memoize, set, getLens);
 
+const splitParams = split('&');
+const splitParamPair = split('=');
+const containsTicket = test(/ticket/);
+const getTicketString = find(containsTicket);
+const makeParamObject = compose(fromPairs, of);
 
-const getFetchData = createSelector(['value', 'data']);
+/**
+ * Takes the raw query string portion of a url and returns an equiv object
+ * if the string contains a ticket param
+ *
+ * @param  {String}
+ * @return {Object}
+ */
+export const getTicket = compose(
+  makeParamObject,
+  splitParamPair,
+  getTicketString,
+  splitParams,
+);
+
+const encodeResponse = data => JSON.parse(data.value);
+const getHeaders = data => data.headers.get('location');
+
+const getFetchData = createSelector('data');
+const getFetchResponse = compose(getFetchData, encodeResponse);
+const getRedirect = compose(objOf('redirect_to'), getHeaders);
+
+const statusIs = propEq('status');
+const statusFilter = cond([
+  [statusIs(401), getRedirect],
+  [statusIs(200), getFetchResponse],
+]);
 
 /**
  * Returns a function that passes the value.data property expected fetch result
@@ -147,12 +186,12 @@ const getFetchData = createSelector(['value', 'data']);
  * @param  {Function} func  the callback to pass data to
  * @return {Function}
  */
-export const fetchCallback = func => compose(func, getFetchData);
-
+export const fetchCallback = func => compose(func, statusFilter);
 export default {
   createReducer,
   createAction,
   createSelector,
   createSetter,
   fetchCallback,
+  getTicket,
 };
