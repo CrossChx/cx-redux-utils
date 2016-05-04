@@ -1,4 +1,6 @@
 import { expect } from 'chai';
+import { namedApiFetchTest } from './namedApiFetchTest';
+
 import {
   createAction,
   createReducer,
@@ -6,9 +8,11 @@ import {
   createSetter,
   fetchCallback,
   getTicket,
+  hasMethod,
 } from '../src/index';
 
 import {
+  testSet,
   testIfExists,
   shouldBeAFunction,
   shouldBeAnObject,
@@ -349,71 +353,87 @@ describe('Redux Utils', () => {
         });
       });
     });
+  });
 
-    describe('#getTicket', () => {
-      const ticketVal = 'thisIsTheFreakingTicket';
-      const result = getTicket(`?param1=val1&param2=val2&ticket=${ticketVal}`);
-      const expected = { ticket: ticketVal };
+  describe('#getTicket', () => {
+    const ticketVal = 'thisIsTheFreakingTicket';
+    const result = getTicket(`?param1=val1&param2=val2&ticket=${ticketVal}`);
+    const expected = { ticket: ticketVal };
 
-      testIfExists(result);
-      shouldBeAnObject(result);
+    testIfExists(result);
+    shouldBeAnObject(result);
 
-      it('should return the expected ticket value', () => {
-        expect(result).to.deep.equal(expected);
-      });
+    it('should return the expected ticket value', () => {
+      expect(result).to.deep.equal(expected);
     });
+  });
 
-    describe('#fetchCallback', () => {
-      const target = 'i am the one you seek';
-      const url = 'http://www.testy-pants.com';
-      const okResponse = {
-        value: '{"data":"i am the one you seek"}',
-        status: 200,
-      };
+  describe('#hasMethod', () => {
+    const set = [
+      ['given undefined value at `method`', { method: undefined }, false],
+      ['given an empty object', {}, false],
+      ['given a truthy value at `method`', { method: true }, true],
+    ];
 
-      const noAuthResponse = {
-        value: '{"data":"i am the one you seek"}',
-        headers: {
-          get(prop) {
-            return prop === 'location' ? url : '';
-          },
+    set.forEach(test => testSet(test, hasMethod));
+  });
+
+  /**
+   * These just test what will be the exported result of `queueFetch`, `umsFetch` etc...
+   */
+  namedApiFetchTest('queue');
+  namedApiFetchTest('ums');
+
+  describe('#fetchCallback', () => {
+    const target = 'i am the one you seek';
+    const url = 'http://www.testy-pants.com';
+    const okResponse = {
+      value: '{"data":"i am the one you seek"}',
+      status: 200,
+    };
+
+    const noAuthResponse = {
+      value: '{"data":"i am the one you seek"}',
+      headers: {
+        get(prop) {
+          return prop === 'location' ? url : '';
         },
-        status: 401,
-      };
-      const testFetchHandler = data => data;
+      },
+      status: 401,
+    };
+    const testFetchHandler = data => data;
 
-      describe('when passed a valid callback to handle response data', () => {
-        const callback = fetchCallback(testFetchHandler);
+    describe('when passed a valid callback to handle response data', () => {
+      const callback = fetchCallback(testFetchHandler);
 
-        testIfExists(callback);
-        shouldBeAFunction(callback);
+      testIfExists(callback);
+      shouldBeAFunction(callback);
 
-        describe('when the resulting function is passed', () => {
-          runErrorCases(callback);
+      describe('when the resulting function is passed', () => {
+        runErrorCases(callback);
 
-          describe('a valid response object', () => {
-            const result = callback(okResponse);
+        describe('a valid response object', () => {
+          const result = callback(okResponse);
 
-            shouldNotThrow(callback, okResponse);
-            testIfExists(result);
-            shouldBeAString(result);
-            it('should correctly return the target property and process it', () => {
-              expect(result).to.equal(target);
-            });
+          shouldNotThrow(callback, okResponse);
+          testIfExists(result);
+          shouldBeAString(result);
+          it('should correctly return the target property and process it', () => {
+            expect(result).to.equal(target);
+          });
+        });
+
+        describe('a 401 response object with location header', () => {
+          const result = callback(noAuthResponse);
+
+          testIfExists(result);
+          shouldBeAnObject(result);
+          it('should have a redirect_to key', () => {
+            expect(result).to.have.all.keys('redirect_to');
           });
 
-          describe('a 401 response object with location header', () => {
-            const result = callback(noAuthResponse);
-
-            testIfExists(result);
-            shouldBeAnObject(result);
-            it('should have a redirect_to key', () => {
-              expect(result).to.have.all.keys('redirect_to');
-            });
-
-            it('should return the expected result', () => {
-              expect(result).to.deep.equal({ redirect_to: url });
-            });
+          it('should return the expected result', () => {
+            expect(result).to.deep.equal({ redirect_to: url });
           });
         });
       });

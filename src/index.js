@@ -2,19 +2,24 @@ import {
   always,
   compose,
   cond,
+  curry,
   equals,
   find,
   fromPairs,
+  identity,
   ifElse,
   isArrayLike,
+  isNil,
   lensPath,
   lensProp,
   memoize,
   merge,
   mergeAll,
+  not,
   nthArg,
   objOf,
   of,
+  pathSatisfies,
   propEq,
   propOr,
   set,
@@ -25,6 +30,7 @@ import {
   view,
 } from 'ramda';
 
+const exists = compose(not, isNil);
 const emptyObject = always({});
 const getPropOrEmptyObjectFunction = propOr(emptyObject);
 const getPropOrEmptyString = propOr('');
@@ -187,11 +193,78 @@ const statusFilter = cond([
  * @return {Function}
  */
 export const fetchCallback = func => compose(func, statusFilter);
+
+/**
+ * Mirror of the redux-effects-fetch action creator
+ *
+ * @param  {String} url
+ * @param  {Object} params
+ * @return {Object}
+ */
+const standardFetch = (url = '', params = {}) => ({
+  type: 'EFFECT_FETCH',
+  payload: {
+    url,
+    params,
+  },
+});
+
+/**
+ * Returns a headers object with a specific crosschx api name
+ *
+ * @param  {String} apiName
+ * @return {Object}
+ */
+const headersWithNamedAccept = apiName => ({
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: `application/x.${apiName}-api.1+json`,
+  },
+});
+
+const methodPath = ['method'];
+const setMethod = createSetter(methodPath);
+export const hasMethod = pathSatisfies(exists, methodPath);
+
+export const defaultMethodToGet = ifElse(
+  hasMethod,
+  identity,
+  setMethod('GET'),
+);
+
+export const processParams = compose(defaultMethodToGet, merge);
+
+/**
+ * Curryable function to wrap a redux-effects-fetch compliant action creator
+ * with the name of a specific api to simplify api from dev perspective
+ *
+ * @param  {String} apiName name of the api will both prepend the url and add
+ *                          to accept header
+ * @param  {String} url     contextual url for api call
+ * @param  {Object} params  params object for api call, body, method, etc..
+ * @return {Object}         redux-effects-fetch compliant action creator invocation
+ */
+export const namedApiFetchWrapper = curry(
+  (apiName, url, params) => {
+    const finalUrl = `/api/${apiName}.api/${url}`;
+    const headers = headersWithNamedAccept(apiName);
+    const finalParams = processParams(params, headers);
+
+    return standardFetch(finalUrl, finalParams);
+  }
+);
+
+export const queueFetch = namedApiFetchWrapper('queue');
+export const umsFetch = namedApiFetchWrapper('ums');
+
 export default {
-  createReducer,
   createAction,
+  createReducer,
   createSelector,
   createSetter,
   fetchCallback,
   getTicket,
+  hasMethod,
+  queueFetch,
+  umsFetch,
 };
