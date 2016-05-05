@@ -9,6 +9,7 @@ import {
   fetchCallback,
   getTicket,
   hasMethod,
+  parseIfString,
 } from '../src/index';
 
 import {
@@ -381,6 +382,7 @@ describe('Redux Utils', () => {
   /**
    * These just test what will be the exported result of `queueFetch`, `umsFetch` etc...
    */
+  namedApiFetchTest('identity');
   namedApiFetchTest('queue');
   namedApiFetchTest('ums');
 

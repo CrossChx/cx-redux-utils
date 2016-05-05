@@ -20,6 +20,7 @@ import {
   objOf,
   of,
   pathSatisfies,
+  prop,
   propEq,
   propOr,
   set,
@@ -172,11 +173,14 @@ export const getTicket = compose(
   splitParams,
 );
 
-const encodeResponse = data => JSON.parse(data.value);
-const getHeaders = data => data.headers.get('location');
+const parse = s => JSON.parse(s);
+const parseIfString = ifElse(typeIs('String'), parse, identity);
+const encodeResponse = compose(parseIfString, prop('value'));
 
 const getFetchData = createSelector('data');
 const getFetchResponse = compose(getFetchData, encodeResponse);
+
+const getHeaders = data => data.headers.get('location');
 const getRedirect = compose(objOf('redirect_to'), getHeaders);
 
 const statusIs = propEq('status');
