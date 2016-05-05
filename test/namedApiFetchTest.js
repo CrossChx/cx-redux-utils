@@ -9,7 +9,7 @@ export function namedApiFetchTest(apiName) {
     const type = 'EFFECT_FETCH';
     const contentType = 'application/json';
     const accepts = `application/x.${apiName}-api.1+json`;
-    const urlPrefix = `/api/${apiName}.api/`;
+    const urlPrefix = `/api/${apiName}.api`;
 
     describe('when invoked with empty args', () => {
       const method = 'GET';
@@ -55,7 +55,7 @@ export function namedApiFetchTest(apiName) {
 
     describe('when invoked with valid args', () => {
       const method = 'POST';
-      const endpoint = 'testEndpoint/1/test';
+      const endpoint = '/testEndpoint/1/test';
       const url = `${urlPrefix}${endpoint}`;
       const body = {
         testKey1: 'testVal1',
@@ -106,7 +106,7 @@ export function namedApiFetchTest(apiName) {
 
     describe('when invoked with only a url', () => {
       const method = 'GET';
-      const endpoint = 'testEndpoint/1/test';
+      const endpoint = '/testEndpoint/1/test';
       const url = `${urlPrefix}${endpoint}`;
 
       const result = fetch(endpoint);

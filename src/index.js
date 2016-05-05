@@ -2,7 +2,6 @@ import {
   always,
   compose,
   cond,
-  curry,
   equals,
   find,
   fromPairs,
@@ -250,7 +249,7 @@ export const processParams = compose(defaultMethodToGet, merge);
  */
 export const namedApiFetchWrapper =
   apiName => (url, params = {}) => {
-    const finalUrl = `/api/${apiName}.api/${url}`;
+    const finalUrl = `/api/${apiName}.api${url}`;
     const headers = headersWithNamedAccept(apiName);
     const finalParams = processParams(params, headers);
 
