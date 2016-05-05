@@ -248,15 +248,14 @@ export const processParams = compose(defaultMethodToGet, merge);
  * @param  {Object} params  params object for api call, body, method, etc..
  * @return {Object}         redux-effects-fetch compliant action creator invocation
  */
-export const namedApiFetchWrapper = curry(
-  (apiName, url, params) => {
+export const namedApiFetchWrapper =
+  apiName => (url, params = {}) => {
     const finalUrl = `/api/${apiName}.api/${url}`;
     const headers = headersWithNamedAccept(apiName);
     const finalParams = processParams(params, headers);
 
     return standardFetch(finalUrl, finalParams);
-  }
-);
+  };
 
 export const queueFetch = namedApiFetchWrapper('queue');
 export const umsFetch = namedApiFetchWrapper('ums');
