@@ -1,16 +1,21 @@
 import {
   always,
+  and,
   compose,
   cond,
+  curry,
   equals,
   find,
+  flip,
   fromPairs,
+  gte,
   identity,
   ifElse,
   isArrayLike,
   isNil,
   lensPath,
   lensProp,
+  lt,
   memoize,
   merge,
   mergeAll,
@@ -181,20 +186,32 @@ export const getTicket = compose(
   splitParams,
 );
 
+/**
+ * Status Code evaluation support functions
+ */
+export const statusIs = propEq('status');
+export const statusCodeSatisfies = predicate => compose(predicate, prop('status'));
+export const statusCodeGTE = compose(statusCodeSatisfies, flip(gte));
+export const statusCodeLT = compose(statusCodeSatisfies, flip(lt));
+export const statusWithinRange = curry(
+  (l, h) => and(statusCodeGTE(l), statusCodeLT(h))
+);
+
+/**
+ * Response handling support functions
+ */
 export const parse = s => JSON.parse(s);
 export const parseIfString = ifElse(typeIs('String'), parse, identity);
 export const encodeResponse = compose(parseIfString, prop('value'));
-
 export const getFetchData = createSelector('data');
 export const getFetchResponse = compose(getFetchData, encodeResponse);
 
 export const getHeaders = data => data.headers.get('location');
 export const getRedirect = compose(objOf('redirect_to'), getHeaders);
 
-export const statusIs = propEq('status');
 export const statusFilter = cond([
   [statusIs(401), getRedirect],
-  [statusIs(200), getFetchResponse],
+  [statusWithinRange(200, 300), getFetchResponse],
 ]);
 
 /**

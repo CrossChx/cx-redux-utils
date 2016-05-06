@@ -2,15 +2,22 @@ import { expect } from 'chai';
 import { namedApiFetchTest } from './namedApiFetchTest';
 
 import {
-  createAction,
-  createReducer,
-  reduceReducers,
-  createSelector,
-  createSetter,
-  fetchCallback,
+  // Support functions
   getTicket,
   hasMethod,
   parseIfString,
+  statusIs,
+  statusCodeLT,
+  statusCodeGTE,
+  statusWithinRange,
+
+  // Redux utils
+  createAction,
+  createReducer,
+  createSelector,
+  createSetter,
+  fetchCallback,
+  reduceReducers,
 } from '../src/index';
 
 import {
@@ -44,6 +51,140 @@ const runErrorCases = callback => {
     shouldNotThrow(callback, []);
   });
 };
+
+describe('Support functions', () => {
+  describe('#parseIfString', () => {
+    const object = { data: 'i am the one you seek' };
+
+    describe('given a json string', () => {
+      const jsonString = '{"data":"i am the one you seek"}';
+      const result = parseIfString(jsonString);
+
+      testIfExists(result);
+      shouldBeAnObject(result);
+      it('should return a correct object', () => {
+        expect(result).to.deep.equal(object);
+      });
+    });
+
+    describe('given a javascript object', () => {
+      const result = parseIfString(object);
+
+      testIfExists(result);
+      shouldBeAnObject(result);
+      it('should return a correct object', () => {
+        expect(result).to.deep.equal(object);
+      });
+    });
+  });
+
+  describe('#hasMethod', () => {
+    const set = [
+      ['given undefined value at `method`', { method: undefined }, false],
+      ['given an empty object', {}, false],
+      ['given a truthy value at `method`', { method: true }, true],
+    ];
+
+    set.forEach(test => testSet(test, hasMethod));
+  });
+
+  describe('#getTicket', () => {
+    const ticketVal = 'thisIsTheFreakingTicket';
+    const result = getTicket(`?param1=val1&param2=val2&ticket=${ticketVal}`);
+    const expected = { ticket: ticketVal };
+
+    testIfExists(result);
+    shouldBeAnObject(result);
+
+    it('should return the expected ticket value', () => {
+      expect(result).to.deep.equal(expected);
+    });
+  });
+
+  describe('#statusIs', () => {
+    describe('when passed a status code', () => {
+      const predicate = statusIs(200);
+
+      testIfExists(predicate);
+      shouldBeAFunction(predicate);
+
+      describe('when the result is passed an object with a status key set to 200', () => {
+        const result = predicate({ status: 200 });
+
+        testIfExists(result);
+        shouldBeABoolean(result);
+
+        it('should return true', () => {
+          expect(result).to.equal(true);
+        });
+      });
+
+      describe('when the result is passed an object with a status key set to 300', () => {
+        const result = predicate({ status: 300 });
+
+        shouldBeABoolean(result);
+
+        it('should return false', () => {
+          expect(result).to.equal(false);
+        });
+      });
+    });
+  });
+
+  describe('#statusCodeLT', () => {
+    describe('when passed value of 10', () => {
+      const lessThan = statusCodeLT(10);
+
+      describe('when the resulting function is passed', () => {
+        const set = [
+          [0, { status: 0 }, true],
+          [5, { status: 5 }, true],
+          [10, { status: 10 }, false],
+          [11, { status: 11 }, false],
+        ];
+
+        set.forEach(test => testSet(test, lessThan));
+      });
+    });
+  });
+
+  describe('#statusCodeGTE', () => {
+    const greaterThan = statusCodeGTE(10);
+
+    describe('when the resulting function is passed', () => {
+      const set = [
+        [0, { status: 0 }, false],
+        [5, { status: 5 }, false],
+        [10, { status: 10 }, true],
+        [11, { status: 11 }, true],
+      ];
+
+      set.forEach(test => testSet(test, greaterThan));
+    });
+  });
+
+  describe('#statusWithinRange', () => {
+    describe('when passed a lower bound of 1 and an upper bound of 10', () => {
+      const ranger = statusWithinRange(1, 10);
+
+      testIfExists(ranger);
+      shouldBeAFunction(ranger);
+
+      describe('when the resulting function is passed', () => {
+        const set = [
+          [1, { status: 1 }, true],
+          [2, { status: 2 }, true],
+          [3, { status: 3 }, true],
+          [11, { status: 11 }, false],
+          [13, { status: 13 }, false],
+          [15, { status: 15 }, false],
+        ];
+
+        set.forEach(test => testSet(test, ranger));
+      });
+    });
+  });
+});
 
 describe('Redux Utils', () => {
   const TEST_ACTION_TYPE = 'TEST_ACTION_TYPE';
@@ -386,36 +527,6 @@ describe('Redux Utils', () => {
     });
   });
 
-  describe('#getTicket', () => {
-    const ticketVal = 'thisIsTheFreakingTicket';
-    const result = getTicket(`?param1=val1&param2=val2&ticket=${ticketVal}`);
-    const expected = { ticket: ticketVal };
-
-    testIfExists(result);
-    shouldBeAnObject(result);
-
-    it('should return the expected ticket value', () => {
-      expect(result).to.deep.equal(expected);
-    });
-  });
-
-  describe('#hasMethod', () => {
-    const set = [
-      ['given undefined value at `method`', { method: undefined }, false],
-      ['given an empty object', {}, false],
-      ['given a truthy value at `method`', { method: true }, true],
-    ];
-
-    set.forEach(test => testSet(test, hasMethod));
-  });
-
-  /**
-   * These just test what will be the exported result of `queueFetch`, `umsFetch` etc...
-   */
-  namedApiFetchTest('identity');
-  namedApiFetchTest('queue');
-  namedApiFetchTest('ums');
-
   describe('#fetchCallback', () => {
     const target = 'i am the one you seek';
     const url = 'http://www.testy-pants.com';
@@ -472,28 +583,12 @@ describe('Redux Utils', () => {
     });
   });
 
-  describe('#parseIfString', () => {
-    const object = { data: 'i am the one you seek' };
-
-    describe('given a json string', () => {
-      const jsonString = '{"data":"i am the one you seek"}';
-      const result = parseIfString(jsonString);
-
-      testIfExists(result);
-      shouldBeAnObject(result);
-      it('should return a correct object', () => {
-        expect(result).to.deep.equal(object);
-      });
-    });
-
-    describe('given a javascript object', () => {
-      const result = parseIfString(object);
-
-      testIfExists(result);
-      shouldBeAnObject(result);
-      it('should return a correct object', () => {
-        expect(result).to.deep.equal(object);
-      });
-    });
-  });
+  /**
+   * These just test what will be the exported result of `queueFetch`, `umsFetch` etc...
+   * Mostly ensures that each api name does not cause any unforeseen string
+   * concatenating issues
+   */
+  namedApiFetchTest('identity');
+  namedApiFetchTest('queue');
+  namedApiFetchTest('ums');
 });
