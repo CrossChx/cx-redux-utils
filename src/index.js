@@ -120,10 +120,8 @@ export function reduceReducers(...reducers) {
  *                            object of the given action type with the given
  *                            payload
  */
-export const createAction = actionType => (payload = {}) => ({
-  type: actionType,
-  payload,
-});
+export const createAction = actionType =>
+  (payload = {}, meta = {}) => ({ type: actionType, payload, meta });
 
 /**
  * Returns a lens that focuses on a top level property if passed a string,

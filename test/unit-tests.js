@@ -226,13 +226,16 @@ describe('Redux Utils', () => {
       });
 
       describe('given a payload passed to the function created, the result', () => {
-        const createdAction = creator({ testKey: 'testVal' });
+        const payload = { testPayloadKey: 'testPayloadVal' };
+        const meta = { testMetaKey: 'testMetaVal' };
+
+        const createdAction = creator(payload, meta);
 
         testIfExists(createdAction);
         shouldBeAnObject(createdAction);
 
         it('should have a "type" and "payload" key', () => {
-          expect(createdAction).to.contain.all.keys('type', 'payload');
+          expect(createdAction).to.contain.all.keys('type', 'payload', 'meta');
         });
 
         it('should have a "type" value of TEST_ACTION_TYPE', () => {
@@ -240,7 +243,11 @@ describe('Redux Utils', () => {
         });
 
         it('should retain the payload passed to it', () => {
-          expect(createdAction.payload).to.deep.equal({ testKey: 'testVal' });
+          expect(createdAction.payload).to.deep.equal(payload);
+        });
+
+        it('should retain the meta passed to it', () => {
+          expect(createdAction.meta).to.deep.equal(meta);
         });
       });
     });
