@@ -4,6 +4,7 @@ import { namedApiFetchTest } from './namedApiFetchTest';
 import {
   createAction,
   createReducer,
+  reduceReducers,
   createSelector,
   createSetter,
   fetchCallback,
@@ -190,6 +191,28 @@ describe('Redux Utils', () => {
           });
         });
       });
+    });
+  });
+
+  describe('#reduceReducers', () => {
+    it('combines multiple reducers into a single reducer', () => {
+      const reducer = reduceReducers(
+        (prev, curr) => ({ ...prev, A: prev.A + curr }),
+        (prev, curr) => ({ ...prev, B: prev.B * curr }),
+      );
+
+      expect(reducer({ A: 1, B: 2 }, 3)).to.deep.equal({ A: 4, B: 6 });
+      expect(reducer({ A: 5, B: 8 }, 13)).to.deep.equal({ A: 18, B: 104 });
+    });
+
+    it('chains multiple reducers into a single reducer', () => {
+      const addReducer = (prev, curr) => ({ ...prev, A: prev.A + curr });
+      const multReducer = (prev, curr) => ({ ...prev, A: prev.A * curr });
+      const reducerAddMult = reduceReducers(addReducer, multReducer);
+      const reducerMultAdd = reduceReducers(multReducer, addReducer);
+
+      expect(reducerAddMult({ A: 1, B: 2 }, 3)).to.deep.equal({ A: 12, B: 2 });
+      expect(reducerMultAdd({ A: 1, B: 2 }, 3)).to.deep.equal({ A: 6, B: 2 });
     });
   });
 
@@ -438,6 +461,31 @@ describe('Redux Utils', () => {
             expect(result).to.deep.equal({ redirect_to: url });
           });
         });
+      });
+    });
+  });
+
+  describe('#parseIfString', () => {
+    const object = { data: 'i am the one you seek' };
+
+    describe('given a json string', () => {
+      const jsonString = '{"data":"i am the one you seek"}';
+      const result = parseIfString(jsonString);
+
+      testIfExists(result);
+      shouldBeAnObject(result);
+      it('should return a correct object', () => {
+        expect(result).to.deep.equal(object);
+      });
+    });
+
+    describe('given a javascript object', () => {
+      const result = parseIfString(object);
+
+      testIfExists(result);
+      shouldBeAnObject(result);
+      it('should return a correct object', () => {
+        expect(result).to.deep.equal(object);
       });
     });
   });

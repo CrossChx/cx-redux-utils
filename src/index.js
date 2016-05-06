@@ -100,6 +100,17 @@ export function createReducer(defaultState, ...actionMaps) {
 }
 
 /**
+ * Creates a single reducer from an n length list of reducers
+ *
+ * @param  {Function} reducers
+ * @return {Function}
+ */
+export function reduceReducers(...reducers) {
+  return (previous, current) =>
+    reducers.reduce((p, r) => r(p, current), previous);
+}
+
+/**
  * Given the specified type, return a function that creates an object with a
  * specified type, and assign its arguments to a payload object
  *
@@ -172,18 +183,18 @@ export const getTicket = compose(
   splitParams,
 );
 
-const parse = s => JSON.parse(s);
-const parseIfString = ifElse(typeIs('String'), parse, identity);
-const encodeResponse = compose(parseIfString, prop('value'));
+export const parse = s => JSON.parse(s);
+export const parseIfString = ifElse(typeIs('String'), parse, identity);
+export const encodeResponse = compose(parseIfString, prop('value'));
 
-const getFetchData = createSelector('data');
-const getFetchResponse = compose(getFetchData, encodeResponse);
+export const getFetchData = createSelector('data');
+export const getFetchResponse = compose(getFetchData, encodeResponse);
 
-const getHeaders = data => data.headers.get('location');
-const getRedirect = compose(objOf('redirect_to'), getHeaders);
+export const getHeaders = data => data.headers.get('location');
+export const getRedirect = compose(objOf('redirect_to'), getHeaders);
 
-const statusIs = propEq('status');
-const statusFilter = cond([
+export const statusIs = propEq('status');
+export const statusFilter = cond([
   [statusIs(401), getRedirect],
   [statusIs(200), getFetchResponse],
 ]);
