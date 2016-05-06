@@ -76,6 +76,10 @@ describe('Support functions', () => {
         expect(result).to.deep.equal(object);
       });
     });
+
+    shouldNotThrow(parseIfString, null);
+    shouldNotThrow(parseIfString, undefined);
+    shouldNotThrow(parseIfString, '');
   });
 
   describe('#hasMethod', () => {

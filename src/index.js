@@ -11,6 +11,7 @@ import {
   gte,
   identity,
   ifElse,
+  isEmpty,
   isArrayLike,
   isNil,
   lensPath,
@@ -200,7 +201,7 @@ export const statusWithinRange = curry(
 /**
  * Response handling support functions
  */
-export const parse = s => JSON.parse(s);
+export const parse = s => JSON.parse(isEmpty(s) ? '{}' : s);
 export const parseIfString = ifElse(typeIs('String'), parse, identity);
 export const encodeResponse = compose(parseIfString, prop('value'));
 export const getFetchData = createSelector('data');
