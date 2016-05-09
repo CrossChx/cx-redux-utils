@@ -285,6 +285,7 @@ export const namedApiFetchWrapper =
     return standardFetch(finalUrl, finalParams);
   };
 
+export const identityFetch = namedApiFetchWrapper('identity');
 export const queueFetch = namedApiFetchWrapper('queue');
 export const umsFetch = namedApiFetchWrapper('ums');
 
@@ -296,6 +297,7 @@ export default {
   fetchCallback,
   getTicket,
   hasMethod,
+  identityFetch,
   queueFetch,
   umsFetch,
 };
