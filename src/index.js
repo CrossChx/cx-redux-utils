@@ -247,8 +247,10 @@ const standardFetch = (url = '', params = {}) => ({
  */
 const headersWithNamedAccept = apiName => ({
   headers: {
-    'Content-Type': 'application/json',
     Accept: `application/x.${apiName}-api.1+json`,
+    'Content-Type': 'application/json',
+    'cx-app': APP_NAME,
+    'cx-app-version': APP_VERSION,
   },
 });
 

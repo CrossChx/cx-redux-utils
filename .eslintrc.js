@@ -9,4 +9,8 @@ module.exports = {
   'env': {
     'mocha': true,
   },
+  'globals': {
+    'APP_NAME': true,
+    'APP_VERSION': true,
+  },
 };
