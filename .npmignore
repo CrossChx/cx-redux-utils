@@ -1,5 +1,4 @@
 # Source dir
-src
 test
 
 # Config files
@@ -8,5 +7,4 @@ test
 .jsbeautifyrc
 .eslintignore
 .eslintrc.js
-LICENSE
 webpack.config.js

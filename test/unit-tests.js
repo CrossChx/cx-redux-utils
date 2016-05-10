@@ -21,7 +21,7 @@ import {
 } from '../src/index';
 
 import {
-  testSet,
+  testCases,
   testIfExists,
   shouldBeAFunction,
   shouldBeAnObject,
@@ -83,13 +83,11 @@ describe('Support functions', () => {
   });
 
   describe('#hasMethod', () => {
-    const set = [
+    testCases(hasMethod,
       ['given undefined value at `method`', { method: undefined }, false],
       ['given an empty object', {}, false],
       ['given a truthy value at `method`', { method: true }, true],
-    ];
-
-    set.forEach(test => testSet(test, hasMethod));
+    );
   });
 
   describe('#getTicket', () => {
@@ -140,14 +138,12 @@ describe('Support functions', () => {
       const lessThan = statusCodeLT(10);
 
       describe('when the resulting function is passed', () => {
-        const set = [
+        testCases(lessThan,
           [0, { status: 0 }, true],
           [5, { status: 5 }, true],
           [10, { status: 10 }, false],
           [11, { status: 11 }, false],
-        ];
-
-        set.forEach(test => testSet(test, lessThan));
+        );
       });
     });
   });
@@ -156,14 +152,12 @@ describe('Support functions', () => {
     const greaterThan = statusCodeGTE(10);
 
     describe('when the resulting function is passed', () => {
-      const set = [
+      testCases(greaterThan,
         [0, { status: 0 }, false],
         [5, { status: 5 }, false],
         [10, { status: 10 }, true],
         [11, { status: 11 }, true],
-      ];
-
-      set.forEach(test => testSet(test, greaterThan));
+      );
     });
   });
 
@@ -175,16 +169,14 @@ describe('Support functions', () => {
       shouldBeAFunction(ranger);
 
       describe('when the resulting function is passed', () => {
-        const set = [
+        testCases(ranger,
           [1, { status: 1 }, true],
           [2, { status: 2 }, true],
           [3, { status: 3 }, true],
           [11, { status: 11 }, false],
           [13, { status: 13 }, false],
           [15, { status: 15 }, false],
-        ];
-
-        set.forEach(test => testSet(test, ranger));
+        );
       });
     });
   });
