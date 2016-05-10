@@ -2,6 +2,10 @@ import { expect } from 'chai';
 import { testIfExists, shouldBeAnObject } from 'how-the-test-was-won';
 import { namedApiFetchWrapper } from '../src/index';
 
+// Globals to simulate angular app running env
+global.APP_NAME = 'testApp';
+global.APP_VERSION = '1.0';
+
 export function namedApiFetchTest(apiName) {
   const fetch = namedApiFetchWrapper(apiName);
 
@@ -10,6 +14,12 @@ export function namedApiFetchTest(apiName) {
     const contentType = 'application/json';
     const accepts = `application/x.${apiName}-api.1+json`;
     const urlPrefix = `/api/${apiName}.api`;
+    const headers = {
+      Accept: accepts,
+      'Content-Type': contentType,
+      'cx-app': APP_NAME,
+      'cx-app-version': APP_VERSION,
+    };
 
     describe('when invoked with empty args', () => {
       const method = 'GET';
@@ -20,7 +30,7 @@ export function namedApiFetchTest(apiName) {
           url: urlPrefix,
           params: {
             method,
-            headers: { Accept: accepts, 'Content-Type': contentType },
+            headers,
           },
         },
       };
@@ -71,7 +81,7 @@ export function namedApiFetchTest(apiName) {
           params: {
             body,
             method,
-            headers: { Accept: accepts, 'Content-Type': contentType },
+            headers,
           },
         },
       };
@@ -116,7 +126,7 @@ export function namedApiFetchTest(apiName) {
           url,
           params: {
             method,
-            headers: { Accept: accepts, 'Content-Type': contentType },
+            headers,
           },
         },
       };
