@@ -247,8 +247,10 @@ const standardFetch = (url = '', params = {}) => ({
  */
 const headersWithNamedAccept = apiName => ({
   headers: {
-    'Content-Type': 'application/json',
     Accept: `application/x.${apiName}-api.1+json`,
+    'Content-Type': 'application/json',
+    'cx-app': APP_NAME,
+    'cx-app-version': APP_VERSION,
   },
 });
 
@@ -283,6 +285,7 @@ export const namedApiFetchWrapper =
     return standardFetch(finalUrl, finalParams);
   };
 
+export const identityFetch = namedApiFetchWrapper('identity');
 export const queueFetch = namedApiFetchWrapper('queue');
 export const umsFetch = namedApiFetchWrapper('ums');
 
@@ -294,6 +297,7 @@ export default {
   fetchCallback,
   getTicket,
   hasMethod,
+  identityFetch,
   queueFetch,
   umsFetch,
 };
