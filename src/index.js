@@ -295,6 +295,7 @@ export default {
   createReducer,
   createSelector,
   createSetter,
+  encounterFetch,
   fetchCallback,
   getTicket,
   hasMethod,
