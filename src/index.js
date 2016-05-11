@@ -277,19 +277,19 @@ export const processParams = compose(defaultMethodToGet, merge);
  * @return {Object}         redux-effects-fetch compliant action creator invocation
  */
 export const namedApiFetchWrapper =
-  apiName => (url, params = {}) => {
-    const finalUrl = `/api/${apiName}${url}`;
+  (apiName, suffix = '.api') => (url, params = {}) => {
+    const finalUrl = `/api/${apiName}${suffix}${url}`;
     const headers = headersWithNamedAccept(apiName);
     const finalParams = processParams(params, headers);
 
     return standardFetch(finalUrl, finalParams);
   };
 
-export const identityFetch = namedApiFetchWrapper('identity.api');
-export const issueFetch = namedApiFetchWrapper('issue.service');
-export const encounterFetch = namedApiFetchWrapper('encounter.api');
-export const queueFetch = namedApiFetchWrapper('queue.api');
-export const umsFetch = namedApiFetchWrapper('ums.api');
+export const identityFetch = namedApiFetchWrapper('identity');
+export const issueFetch = namedApiFetchWrapper('issue', '.service');
+export const encounterFetch = namedApiFetchWrapper('encounter');
+export const queueFetch = namedApiFetchWrapper('queue');
+export const umsFetch = namedApiFetchWrapper('ums');
 
 export default {
   createAction,

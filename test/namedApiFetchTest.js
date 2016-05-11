@@ -6,14 +6,14 @@ import { namedApiFetchWrapper } from '../src/index';
 global.APP_NAME = 'testApp';
 global.APP_VERSION = '1.0';
 
-export function namedApiFetchTest(apiName) {
-  const fetch = namedApiFetchWrapper(apiName);
+export function namedApiFetchTest(apiName, suffix = null) {
+  const fetch = namedApiFetchWrapper(apiName, suffix);
 
   describe(`#${apiName}`, () => {
     const type = 'EFFECT_FETCH';
     const contentType = 'application/json';
     const accepts = `application/x.${apiName}-api.1+json`;
-    const urlPrefix = `/api/${apiName}.api`;
+    const urlPrefix = `/api/${apiName}${suffix}`;
     const headers = {
       Accept: accepts,
       'Content-Type': contentType,
