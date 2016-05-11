@@ -13,7 +13,7 @@ export function namedApiFetchTest(apiName) {
     const type = 'EFFECT_FETCH';
     const contentType = 'application/json';
     const accepts = `application/x.${apiName}-api.1+json`;
-    const urlPrefix = `/api/${apiName}.api`;
+    const urlPrefix = `/api/${apiName}`;
     const headers = {
       Accept: accepts,
       'Content-Type': contentType,
