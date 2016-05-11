@@ -7,4 +7,3 @@ test
 .jsbeautifyrc
 .eslintignore
 .eslintrc.js
-webpack.config.js
