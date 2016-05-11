@@ -278,17 +278,18 @@ export const processParams = compose(defaultMethodToGet, merge);
  */
 export const namedApiFetchWrapper =
   apiName => (url, params = {}) => {
-    const finalUrl = `/api/${apiName}.api${url}`;
+    const finalUrl = `/api/${apiName}${url}`;
     const headers = headersWithNamedAccept(apiName);
     const finalParams = processParams(params, headers);
 
     return standardFetch(finalUrl, finalParams);
   };
 
-export const identityFetch = namedApiFetchWrapper('identity');
-export const encounterFetch = namedApiFetchWrapper('encounter');
-export const queueFetch = namedApiFetchWrapper('queue');
-export const umsFetch = namedApiFetchWrapper('ums');
+export const identityFetch = namedApiFetchWrapper('identity.api');
+export const issueFetch = namedApiFetchWrapper('issue.service');
+export const encounterFetch = namedApiFetchWrapper('encounter.api');
+export const queueFetch = namedApiFetchWrapper('queue.api');
+export const umsFetch = namedApiFetchWrapper('ums.api');
 
 export default {
   createAction,
