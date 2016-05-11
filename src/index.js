@@ -301,6 +301,7 @@ export default {
   getTicket,
   hasMethod,
   identityFetch,
+  issueFetch,
   queueFetch,
   umsFetch,
 };
