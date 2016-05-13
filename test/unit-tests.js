@@ -585,7 +585,7 @@ describe('Redux Utils', () => {
    * concatenating issues
    */
   namedApiFetchTest('identity');
-  namedApiFetchTest('issue', '.service');
+  namedApiFetchTest('issue');
   namedApiFetchTest('encounter');
   namedApiFetchTest('queue');
   namedApiFetchTest('ums');

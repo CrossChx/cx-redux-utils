@@ -286,7 +286,7 @@ export const namedApiFetchWrapper =
   };
 
 export const identityFetch = namedApiFetchWrapper('identity');
-export const issueFetch = namedApiFetchWrapper('issue', '.service');
+export const issueFetch = namedApiFetchWrapper('issue');
 export const encounterFetch = namedApiFetchWrapper('encounter');
 export const queueFetch = namedApiFetchWrapper('queue');
 export const umsFetch = namedApiFetchWrapper('ums');
