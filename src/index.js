@@ -1,9 +1,12 @@
+/** @module cx-redux-utils */
+
 import {
   always,
   and,
   compose,
   cond,
   curry,
+  defaultTo,
   equals,
   find,
   flip,
@@ -41,7 +44,6 @@ const emptyObject = always({});
 const getPropOrEmptyObjectFunction = propOr(emptyObject);
 const getPropOrEmptyString = propOr('');
 const secondArgument = nthArg(1);
-
 /*
  * -----------------------------------------------------------------------------
  * Redux utilities
@@ -63,8 +65,9 @@ const secondArgument = nthArg(1);
  * Type checker with array support
  * Use like `typeIs('Object', valToCheck)`
  *
- * @param  {String}   typeName  name of type to test for
- * @return {Function}           expects a final value to test for type match
+ * @param  {String} typeName  name of type to test for
+ * @param  {String} typeName  name of type to test for
+ * @return {Boolean}          Expects a final value to test for type match
  */
 const typeIs = typeName => compose(equals(typeName), type, nthArg(0));
 
@@ -77,10 +80,10 @@ const typeIs = typeName => compose(equals(typeName), type, nthArg(0));
  * the handler will be passed the (state, reducerResult) signature
  * upon its predicate evaluating to true
  *
- * @param  {*}      state         an initial state value of any type
- * @param  {Object} reducerResult the result of passing state and action to a
- *                                reducer function
- * @return {Function}             function that takes the two parameters noted above
+ * @function
+ * @param  {*}  state           initial state value of any type
+ * @param  {*}  handlerResult   result of an action handler
+ * @return {*}                  merged object Or handler result
  */
 const applyHandlerByType = cond([
   [typeIs('Object'), merge],
@@ -91,8 +94,14 @@ const applyHandlerByType = cond([
  * Given a list of one or more action map objects, return a reducer function
  * to satisfy the reducer signature expected by redux core
  *
- * @param  {Object} actionMap   an object of pairs like {actionType: actionHandler}
- * @return {Function}           a reducer that calls the specified action map
+ * @param  {Object}     defaultState  will be passed to the resulting reducer
+ *                                    function the first time it is run
+ * @param  {...Object}  actionMap     objects in which each key is an action
+ *                                    types, and its value is an action handler
+ *                                    functions that takes (state, action) as
+ *                                    ordered arguments
+ * @return {Function}                 A reducer function that handles each action
+ *                                    type specified as a key in its action map
  */
 export function createReducer(defaultState, ...actionMaps) {
   const actionMap = mergeAll(actionMaps);
@@ -108,8 +117,10 @@ export function createReducer(defaultState, ...actionMaps) {
 /**
  * Creates a single reducer from an n length list of reducers
  *
- * @param  {Function} reducers
- * @return {Function}
+ * @param  {...Function} reducers any number of reducer functions that take
+ *                                (state, action) as ordered arguments
+ * @return {Function}             A reducer function contstructed by merging
+ *                                all given reducer functions
  */
 export function reduceReducers(...reducers) {
   return (previous, current) =>
@@ -120,9 +131,10 @@ export function reduceReducers(...reducers) {
  * Given the specified type, return a function that creates an object with a
  * specified type, and assign its arguments to a payload object
  *
+ * @function
  * @param  {String} type      redux action type name
  * @param  {Object} optional  payload for this action
- * @return {Function}         function that applys a payload and returns an
+ * @return {Function}         Function that applys a payload and returns an
  *                            object of the given action type with the given
  *                            payload
  */
@@ -130,77 +142,122 @@ export const createAction = actionType =>
   (payload = {}, meta = {}) => ({ type: actionType, payload, meta });
 
 /**
- * Returns a lens that focuses on a top level property if passed a string,
- * and a deep property if passed an array of strings for propPath
+ * Wraps ramda's [lensProp]{@link http://ramdajs.com/0.21.0/docs/#lensProp} and
+ * [lensPath]{@link http://ramdajs.com/0.21.0/docs/#lensPath} to return a lens
+ * that focuses on a top level property if passed a string, and a deep property
+ * if passed an array of strings for propPath
  *
  * Ex. 'key' for top level key,
  * or
  * ['response', 'data', 'createdAt'] for deep prop
- *
+ * @function
  * @param  {*} prop(s) an array for deep prop, or string for top level
- * @return {[type]}              [description]
+ * @return {Function}
+ *
+ * @example
+ * import { view, set } from 'ramda'
+ *
+ * const aLens = getLens('a')
+ * const simpleObj = { a: 'rumble in the bronx', b: 'I like turtles' }
+ * view(aLens, simpleObj) //=> 'rumble in the bronx'
+ *
+ * const cLens = getLens(['a', 'b', 'c'])
+ * const nestedObj = { a: { b: { c: 'I am bored' } } }
+ * set(cLens, 'it is party time', nestedObj)
+ * //=> { a: { b: { c: 'it is party time' } } }
  */
-const getLens = ifElse(isArrayLike, lensPath, lensProp);
+export const getLens = ifElse(isArrayLike, lensPath, lensProp);
 
 /**
- * Create a memoized (caches result of computing with any given argument)
- * function that finds and returns specified prop of an object.
+ * Create a [memoized]{@link https://en.wikipedia.org/wiki/Memoization} function
+ * that finds and returns specified prop of an object.
  *
  * Pass a single string propName for top level key,
  * or an array of propNames for deep nested keys
  *
- * @param  {*}  prop(s) an array for deep prop, or string for top level
- * @return {Function}   used like `const valueISeek = thisSelector(objectToDigThrough)`
+ * @function
+ * @param  {(String|String[])}  props an array for deep prop, or string for top level
+ * @return {Function}                 function that returns the value of a property
+ *                                    at the specified path
+ *
+ * @example
+ * const getA = createSelector('a')
+ * const simpleObj = { a: 'rumble in the bronx', b: 'I like turtles' }
+ * getA(simpleObj) //=> 'rumble in the bronx'
+ *
+ * const getC = createSelector(['a', 'b', 'c'])
+ * const nestedObj = { a: { b: { c: 'rumble in the bronx' } } }
+ * getC(nestedObj) //=> 'rumble in the bronx'
  */
 export const createSelector = compose(memoize, view, getLens);
 
 /**
- * Create a memoized (caches result of computing with any given argument)
+ * Create a [memoized]{@link https://en.wikipedia.org/wiki/Memoization}
  * function that returns a shallow copy of a given object, plus an
  * altered value according the prop it is focused on.
  *
  * Pass a single string propName for top level key,
  * or an array of propNames for deep nested keys
  *
- * @param  {*}  prop(s) an array for deep prop, or string for top level
- * @return {Function}   used like `const newVersionOfObject = thisSetter(newVal, objectToSetPropOn)`
+ * @function
+ * @param  {(String|String[])} props an array of strings for a deep property, or
+ *                                   string for top level property
+ * @return {Function}                function that returns a clone of an object with a new
+ *                                   value set to the property at the specified path
+ * @example
+ * const newVal = 'it is party time'
+ *
+ * const setA = createSetter('a')
+ * const obj = { a: 'I am bored', b: 'I like turtles' }
+ * setA(newVal, obj) //=> { a: 'it is party time', b: 'I like turtles' }
+ *
+ * const setC = createSetter(['a', 'b', 'c'])
+ * const obj = { a: { b: { c: 'I am bored' } } }
+ * setC(newVal, obj) //=> { a: { b: { c: 'it is party time' } } }
  */
 export const createSetter = compose(memoize, set, getLens);
 
 const splitParams = split('&');
-const splitParamPair = split('=');
 const containsTicket = test(/ticket/);
-const getTicketString = find(containsTicket);
 const makeParamObject = compose(fromPairs, of);
+const splitParamPair = compose(
+  split('='),
+  defaultTo('')
+);
+const getTicketString = compose(
+  defaultTo('ticket='),
+  find(containsTicket),
+  defaultTo([])
+);
 
 /**
  * Takes the raw query string portion of a url and returns an equiv object
  * if the string contains a ticket param
  *
- * @param  {String}
- * @return {Object}
+ * @function
+ * @param  {String} standard  querystring of a url (anything after '?' character)
+ * @return {Object}           An object with a single key 'ticket' that contains
+ *                            the ticket param value, or an empty string if no
+ *                            ticket param was found in the querystring
  */
 export const getTicket = compose(
   makeParamObject,
   splitParamPair,
   getTicketString,
-  splitParams,
+  splitParams
 );
 
-/**
- * Status Code evaluation support functions
- */
+// Status Code evaluation support functions
 export const statusIs = propEq('status');
 export const statusCodeSatisfies = predicate => compose(predicate, prop('status'));
-export const statusCodeGTE = compose(statusCodeSatisfies, flip(gte));
-export const statusCodeLT = compose(statusCodeSatisfies, flip(lt));
+export const statusCodeComparator = comp => compose(statusCodeSatisfies, flip(comp));
+export const statusCodeGTE = statusCodeComparator(gte);
+export const statusCodeLT = statusCodeComparator(lt);
 export const statusWithinRange = curry(
   (l, h) => and(statusCodeGTE(l), statusCodeLT(h))
 );
 
-/**
- * Response handling support functions
- */
+// Response handling support functions
 export const parse = s => JSON.parse(isEmpty(s) ? '{}' : s);
 export const parseIfString = ifElse(typeIs('String'), parse, identity);
 export const encodeResponse = compose(parseIfString, prop('value'));
@@ -219,6 +276,7 @@ export const statusFilter = cond([
  * Returns a function that passes the value.data property expected fetch result
  * to the given callback function
  *
+ * @function
  * @param  {Function} func  the callback to pass data to
  * @return {Function}
  */
@@ -227,9 +285,10 @@ export const fetchCallback = func => compose(func, statusFilter);
 /**
  * Mirror of the redux-effects-fetch action creator
  *
- * @param  {String} url
- * @param  {Object} params
- * @return {Object}
+ * @param  {String} url     url to send request to
+ * @param  {Object} params  a standard params object consisting of method,
+ *                          body, headers, etc..
+ * @return {Object}         Standard action object
  */
 const standardFetch = (url = '', params = {}) => ({
   type: 'EFFECT_FETCH',
@@ -242,8 +301,10 @@ const standardFetch = (url = '', params = {}) => ({
 /**
  * Returns a headers object with a specific crosschx api name
  *
- * @param  {String} apiName
- * @return {Object}
+ * @param  {String} apiName name of the api to be used, this will be inserted
+ *                          in the 'Accept' header string
+ * @return {Object}         A headers object intended to be merged in with a
+ *                          provided or default params object
  */
 const headersWithNamedAccept = apiName => ({
   headers: {
@@ -261,7 +322,7 @@ export const hasMethod = pathSatisfies(exists, methodPath);
 export const defaultMethodToGet = ifElse(
   hasMethod,
   identity,
-  setMethod('GET'),
+  setMethod('GET')
 );
 
 export const processParams = compose(defaultMethodToGet, merge);
@@ -270,11 +331,12 @@ export const processParams = compose(defaultMethodToGet, merge);
  * Curryable function to wrap a redux-effects-fetch compliant action creator
  * with the name of a specific api to simplify api from dev perspective
  *
+ * @function
  * @param  {String} apiName name of the api will both prepend the url and add
  *                          to accept header
- * @param  {String} url     contextual url for api call
+ * @param  {String} url     contextual url for request
  * @param  {Object} params  params object for api call, body, method, etc..
- * @return {Object}         redux-effects-fetch compliant action creator invocation
+ * @return {Object}         Redux-effects-fetch compliant action creator invocation
  */
 export const namedApiFetchWrapper =
   (apiName, suffix = '.api') => (url, params = {}) => {
@@ -285,10 +347,79 @@ export const namedApiFetchWrapper =
     return standardFetch(finalUrl, finalParams);
   };
 
+/**
+ * Takes a url and params object like the standard fetch action creator, but
+ * adds a url prefix and headers for identity api
+ *
+ * @function
+ * @param  {String} url             fetch call is sent to this url
+ * @param  {Object} params          params object for request
+ * @param  {Object} params.body     data used in post or put request
+ * @param  {String} params.method   rest verb 'GET', 'POST' etc...
+ * @param  {Object} params.headers  headers object
+ * @return {Object}                 A standard fetch action object with url
+ *                                  prefix and headers for identity api
+ */
 export const identityFetch = namedApiFetchWrapper('identity');
+
+/**
+ * Takes a url and params object like the standard fetch action creator, but
+ * adds a url prefix and headers for issue api
+ *
+ * @function
+ * @param  {String} url             fetch call is sent to this url
+ * @param  {Object} params          params object for request
+ * @param  {Object} params.body     data used in post or put request
+ * @param  {String} params.method   rest verb 'GET', 'POST' etc...
+ * @param  {Object} params.headers  headers object
+ * @return {Object}                 A standard fetch action object with url
+ *                                  prefix and headers for issue api
+ */
 export const issueFetch = namedApiFetchWrapper('issue');
+
+/**
+ * Takes a url and params object like the standard fetch action creator, but
+ * adds a url prefix and headers for encounter api
+ *
+ * @function
+ * @param  {String} url             fetch call is sent to this url
+ * @param  {Object} params          params object for request
+ * @param  {Object} params.body     data used in post or put request
+ * @param  {String} params.method   rest verb 'GET', 'POST' etc...
+ * @param  {Object} params.headers  headers object
+ * @return {Object}                 A standard fetch action object with url
+ *                                  prefix and headers for encounter api
+ */
 export const encounterFetch = namedApiFetchWrapper('encounter');
+
+/**
+ * Takes a url and params object like the standard fetch action creator, but
+ * adds a url prefix and headers for queue api
+ *
+ * @function
+ * @param  {String} url             fetch call is sent to this url
+ * @param  {Object} params          params object for request
+ * @param  {Object} params.body     data used in post or put request
+ * @param  {String} params.method   rest verb 'GET', 'POST' etc...
+ * @param  {Object} params.headers  headers object
+ * @return {Object}                 A standard fetch action object with url
+ *                                  prefix and headers for queue api
+ */
 export const queueFetch = namedApiFetchWrapper('queue');
+
+/**
+ * Takes a url and params object like the standard fetch action creator, but
+ * adds a url prefix and headers for ums api
+ *
+ * @function
+ * @param  {String} url             fetch call is sent to this url
+ * @param  {Object} params          params object for request
+ * @param  {Object} params.body     data used in post or put request
+ * @param  {String} params.method   rest verb 'GET', 'POST' etc...
+ * @param  {Object} params.headers  headers object
+ * @return {Object}                 A standard fetch action object with url
+ *                                  prefix and headers for ums api
+ */
 export const umsFetch = namedApiFetchWrapper('ums');
 
 export default {

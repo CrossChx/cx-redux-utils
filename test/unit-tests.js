@@ -21,17 +21,18 @@ import {
 } from '../src/index';
 
 import {
+  shouldBeABoolean,
+  shouldBeAFunction,
+  shouldBeAnArray,
+  shouldBeAnObject,
+  shouldBeAString,
+  shouldBeUndefined,
+  shouldHaveKeys,
+  shouldNotBeNull,
+  shouldNotThrow,
+  shouldThrow,
   testCases,
   testIfExists,
-  shouldBeAFunction,
-  shouldBeAnObject,
-  shouldBeAnArray,
-  shouldBeAString,
-  shouldBeABoolean,
-  shouldNotBeNull,
-  shouldBeUndefined,
-  shouldThrow,
-  shouldNotThrow,
 } from 'how-the-test-was-won';
 
 const runErrorCases = callback => {
@@ -91,15 +92,31 @@ describe('Support functions', () => {
   });
 
   describe('#getTicket', () => {
+    const querystring = '?param1=val1&param2=val2';
     const ticketVal = 'thisIsTheFreakingTicket';
-    const result = getTicket(`?param1=val1&param2=val2&ticket=${ticketVal}`);
-    const expected = { ticket: ticketVal };
 
-    testIfExists(result);
-    shouldBeAnObject(result);
+    describe('given a url querystring that contains a "ticket" param', () => {
+      const result = getTicket(`${querystring}&ticket=${ticketVal}`);
+      const expected = { ticket: ticketVal };
 
-    it('should return the expected ticket value', () => {
-      expect(result).to.deep.equal(expected);
+      testIfExists(result);
+      shouldBeAnObject(result);
+
+      it('should return the expected ticket value', () => {
+        expect(result).to.deep.equal(expected);
+      });
+    });
+
+    describe('given a url querystring that does not contain a "ticket" param', () => {
+      const result = getTicket(querystring);
+      const expected = { ticket: '' };
+
+      testIfExists(result);
+      shouldBeAnObject(result);
+      shouldHaveKeys(result, 'ticket');
+      it('should return a object with a "ticket" key and empty string', () => {
+        expect(result).to.deep.equal(expected);
+      });
     });
   });
 
