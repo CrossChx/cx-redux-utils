@@ -74,7 +74,7 @@ const applyHandlerByType = cond([
   [T, secondArgument],
 ]);
 
-/** @module redux-utils/reducers */
+/** @module reducers */
 
 /**
  * Given a list of one or more action map objects, return a reducer function
@@ -172,7 +172,7 @@ export function reduceReducers(...reducers) {
     reducers.reduce((p, r) => r(p, current), previous);
 }
 
-/** @module redux-utils/actions */
+/** @module actions */
 
 /**
  * Given the specified type, return a function that creates an object with a
@@ -220,7 +220,7 @@ export const createAction = actionType =>
    * //}
    */
 
-/** @module redux-utils/lenses */
+/** @module lenses */
 
 /**
  * Wraps ramda's [lensProp]{@link http://ramdajs.com/0.21.0/docs/#lensProp} and
@@ -345,9 +345,7 @@ export const getTicket = compose(
   splitParams
 );
 
-/**
- * @module fetch-utils
- */
+/** @module fetch */
 
 // Status Code evaluation support functions
 export const statusIs = propEq('status');
@@ -402,13 +400,31 @@ export const statusFilter = cond([
 export const fetchCallback = func => compose(func, statusFilter);
 
 /**
- * Mirror of the redux-effects-fetch action creator
+ * A standard fetch request params object
  *
- * @ignore
- * @param  {String} url     url to send request to
- * @param  {Object} params  a standard params object consisting of method,
- *                          body, headers, etc..
- * @return {Object}         Standard action object
+ * @typedef   {Object} ParamsObject
+ * @property  {Object} params.body     data used in post or put request
+ * @property  {String} params.method   rest verb 'GET', 'POST' etc...
+ * @property  {Object} params.headers  headers object
+ */
+
+/**
+ * Redux action object compatible with
+ * [redux-effects-fetch]{@link https://github.com/redux-effects/redux-effects-fetch/blob/master/src/index.js#L97}
+ * with a type of 'EFFECT_FETCH', and a payload that describes a [fetch]{@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API} call.
+ *
+ * @typedef   {Object}  FetchAction
+ * @property  {String}  url         the request url for fetch call
+ * @property  {ParamsObject} params the request params for fetch call
+ */
+
+/**
+ * Mirror of the [redux-effects-fetch action creator]{@link https://github.com/redux-effects/redux-effects-fetch/blob/master/src/index.js#L97}
+ *
+ * @param  {String}       url     url to send request to
+ * @param  {ParamsObject} params  a standard params object
+ * @return {FetchAction}          Standard action object with a payload that describes
+ *                                a [fetch]{@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API} call
  */
 const standardFetch = (url = '', params = {}) => ({
   type: 'EFFECT_FETCH',
@@ -452,7 +468,7 @@ export const processParams = compose(defaultMethodToGet, merge);
  * @param  {String} [suffix]  optional extension for the api name ex. `.api`
  * @param  {String} url       contextual url for request
  * @param  {Object} params    params object for api call, body, method, etc..
- * @return {Object}           Redux-effects-fetch compliant action creator invocation
+ * @return {FetchAction}      Redux-effects-fetch compliant action creator invocation
  */
 export const namedApiFetchWrapper =
   (apiName, suffix = '.api') => (url, params = {}) => {
@@ -463,19 +479,14 @@ export const namedApiFetchWrapper =
     return standardFetch(finalUrl, finalParams);
   };
 
-/** @module fetch-utils/action-creators */
-
 /**
  * Takes a url and params object like the [standard fetch action creator]{@link https://github.com/redux-effects/redux-effects-fetch#actions}, but
  * adds a url prefix and headers for identity api
  *
  * @function
  * @param  {String} url             fetch call is sent to this url
- * @param  {Object} params          params object for request
- * @param  {Object} params.body     data used in post or put request
- * @param  {String} params.method   rest verb 'GET', 'POST' etc...
- * @param  {Object} params.headers  headers object
- * @return {Object}                 A standard fetch action object with url
+ * @param  {ParamsObject} params  a standard params object
+ * @return {FetchAction}            A standard fetch action object with url
  *                                  prefix and headers for identity api
  */
 export const identityFetch = namedApiFetchWrapper('identity');
@@ -486,11 +497,8 @@ export const identityFetch = namedApiFetchWrapper('identity');
  *
  * @function
  * @param  {String} url             fetch call is sent to this url
- * @param  {Object} params          params object for request
- * @param  {Object} params.body     data used in post or put request
- * @param  {String} params.method   rest verb 'GET', 'POST' etc...
- * @param  {Object} params.headers  headers object
- * @return {Object}                 A standard fetch action object with url
+ * @param  {ParamsObject} params  a standard params object
+ * @return {FetchAction}            A standard fetch action object with url
  *                                  prefix and headers for issue api
  */
 export const issueFetch = namedApiFetchWrapper('issue');
@@ -501,11 +509,8 @@ export const issueFetch = namedApiFetchWrapper('issue');
  *
  * @function
  * @param  {String} url             fetch call is sent to this url
- * @param  {Object} params          params object for request
- * @param  {Object} params.body     data used in post or put request
- * @param  {String} params.method   rest verb 'GET', 'POST' etc...
- * @param  {Object} params.headers  headers object
- * @return {Object}                 A standard fetch action object with url
+ * @param  {ParamsObject} params  a standard params object
+ * @return {FetchAction}            A standard fetch action object with url
  *                                  prefix and headers for encounter api
  */
 export const encounterFetch = namedApiFetchWrapper('encounter');
@@ -516,11 +521,8 @@ export const encounterFetch = namedApiFetchWrapper('encounter');
  *
  * @function
  * @param  {String} url             fetch call is sent to this url
- * @param  {Object} params          params object for request
- * @param  {Object} params.body     data used in post or put request
- * @param  {String} params.method   rest verb 'GET', 'POST' etc...
- * @param  {Object} params.headers  headers object
- * @return {Object}                 A standard fetch action object with url
+ * @param  {ParamsObject} params  a standard params object
+ * @return {FetchAction}            A standard fetch action object with url
  *                                  prefix and headers for queue api
  */
 export const queueFetch = namedApiFetchWrapper('queue');
@@ -531,11 +533,8 @@ export const queueFetch = namedApiFetchWrapper('queue');
  *
  * @function
  * @param  {String} url             fetch call is sent to this url
- * @param  {Object} params          params object for request
- * @param  {Object} params.body     data used in post or put request
- * @param  {String} params.method   rest verb 'GET', 'POST' etc...
- * @param  {Object} params.headers  headers object
- * @return {Object}                 A standard fetch action object with url
+ * @param  {ParamsObject} params  a standard params object
+ * @return {FetchAction}            A standard fetch action object with url
  *                                  prefix and headers for ums api
  */
 export const umsFetch = namedApiFetchWrapper('ums');
