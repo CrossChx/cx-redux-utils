@@ -1,5 +1,3 @@
-/** @module cx-redux-utils */
-
 import {
   always,
   and,
@@ -44,27 +42,12 @@ const emptyObject = always({});
 const getPropOrEmptyObjectFunction = propOr(emptyObject);
 const getPropOrEmptyString = propOr('');
 const secondArgument = nthArg(1);
-/*
- * -----------------------------------------------------------------------------
- * Redux utilities
- * -----------------------------------------------------------------------------
- *
- * Reusable functions for implementing common redux patterns
- *
- * - createReducer(defaultState, actionMap1, actionMap2, and so on...)
- *
- * - createAction(TYPE)
- *
- * - createSelector('key') or createSelector(['path', 'to', 'key'])
- *
- * - createSetter('key') or createSetter(['path', 'to', 'key'])
- *
- */
 
 /**
  * Type checker with array support
  * Use like `typeIs('Object', valToCheck)`
  *
+ * @ignore
  * @param  {String} typeName  name of type to test for
  * @param  {String} typeName  name of type to test for
  * @return {Boolean}          Expects a final value to test for type match
@@ -80,6 +63,7 @@ const typeIs = typeName => compose(equals(typeName), type, nthArg(0));
  * the handler will be passed the (state, reducerResult) signature
  * upon its predicate evaluating to true
  *
+ * @ignore
  * @function
  * @param  {*}  state           initial state value of any type
  * @param  {*}  handlerResult   result of an action handler
@@ -89,6 +73,10 @@ const applyHandlerByType = cond([
   [typeIs('Object'), merge],
   [T, secondArgument],
 ]);
+
+/**
+ * @module redux-utils
+ */
 
 /**
  * Given a list of one or more action map objects, return a reducer function
@@ -102,6 +90,41 @@ const applyHandlerByType = cond([
  *                                    ordered arguments
  * @return {Function}                 A reducer function that handles each action
  *                                    type specified as a key in its action map
+ *
+ * @example
+ *
+ * const defaultState = {
+ *   people: 1,
+ *   beasts: 1,
+ * }
+ *
+ * const VANQUISH_BEAST = '@@/actionTypes/vanquishBeast';
+ * const vanquishBeast = createAction(VANQUISH_BEAST);
+ * function vanquishBeastHandler(state, action) {
+ *   return {
+ *     ...state,
+ *     beasts: state.beasts - 1,
+ *     weaponUsed: action.payload.weapon,
+ *   }
+ * }
+ *
+ * const SUCCUMB_TO_BEAST = '@@/actionTypes/succumbToBeast';
+ * const succumbToBeast = createAction(SUCCUMB_TO_BEAST);
+ * function succumbToBeastHandler(state, action) {
+ *   return {
+ *     ...state,
+ *     people: state.people - 1,
+ *     lastWords: action.payload.lastWords,
+ *   }
+ * }
+ *
+ * const reducer = createReducer(defaultState, {
+ *   [VANQUISH_BEAST]: vanquishBeastHandler,
+ *   [SUCCUMB_TO_BEAST]: succumbToBeastHandler,
+ * })
+ *
+ * reducer({}, vanquishBeast({ weapon: 'broom' }))
+ * //=> { people: 1, beasts: 0, weapon: 'broom' }
  */
 export function createReducer(defaultState, ...actionMaps) {
   const actionMap = mergeAll(actionMaps);
@@ -137,6 +160,13 @@ export function reduceReducers(...reducers) {
  * @return {Function}         Function that applys a payload and returns an
  *                            object of the given action type with the given
  *                            payload
+ *
+ * @example
+ * const BEGIN_GOOD_TIMES = '@@/actionTypes/gootTimes'
+ * const beginGoodTimes = createAction(BEGIN_GOOD_TIMES);
+ *
+ * beginGoodTimes({ soundTrack: 'Jurrasic Park' })
+ * //=> { type: '@@/actionTypes/gootTimes', meta: {}, payload: { soundTrack: 'Jurrasic Park' } }
  */
 export const createAction = actionType =>
   (payload = {}, meta = {}) => ({ type: actionType, payload, meta });
@@ -247,6 +277,10 @@ export const getTicket = compose(
   splitParams
 );
 
+/**
+ * @module fetch-utils
+ */
+
 // Status Code evaluation support functions
 export const statusIs = propEq('status');
 export const statusCodeSatisfies = predicate => compose(predicate, prop('status'));
@@ -283,8 +317,13 @@ export const statusFilter = cond([
 export const fetchCallback = func => compose(func, statusFilter);
 
 /**
+ * @module fetch-action-creators
+ */
+
+/**
  * Mirror of the redux-effects-fetch action creator
  *
+ * @ignore
  * @param  {String} url     url to send request to
  * @param  {Object} params  a standard params object consisting of method,
  *                          body, headers, etc..
@@ -301,6 +340,7 @@ const standardFetch = (url = '', params = {}) => ({
 /**
  * Returns a headers object with a specific crosschx api name
  *
+ * @ignore
  * @param  {String} apiName name of the api to be used, this will be inserted
  *                          in the 'Accept' header string
  * @return {Object}         A headers object intended to be merged in with a
@@ -318,13 +358,7 @@ const headersWithNamedAccept = apiName => ({
 const methodPath = ['method'];
 const setMethod = createSetter(methodPath);
 export const hasMethod = pathSatisfies(exists, methodPath);
-
-export const defaultMethodToGet = ifElse(
-  hasMethod,
-  identity,
-  setMethod('GET')
-);
-
+export const defaultMethodToGet = ifElse(hasMethod, identity, setMethod('GET'));
 export const processParams = compose(defaultMethodToGet, merge);
 
 /**
@@ -332,11 +366,12 @@ export const processParams = compose(defaultMethodToGet, merge);
  * with the name of a specific api to simplify api from dev perspective
  *
  * @function
- * @param  {String} apiName name of the api will both prepend the url and add
- *                          to accept header
- * @param  {String} url     contextual url for request
- * @param  {Object} params  params object for api call, body, method, etc..
- * @return {Object}         Redux-effects-fetch compliant action creator invocation
+ * @param  {String} apiName   name of the api will both prepend the url and add
+ *                            to accept header
+ * @param  {String} [suffix]  optional extension for the api name ex. `.api`
+ * @param  {String} url       contextual url for request
+ * @param  {Object} params    params object for api call, body, method, etc..
+ * @return {Object}           Redux-effects-fetch compliant action creator invocation
  */
 export const namedApiFetchWrapper =
   (apiName, suffix = '.api') => (url, params = {}) => {
@@ -348,7 +383,7 @@ export const namedApiFetchWrapper =
   };
 
 /**
- * Takes a url and params object like the standard fetch action creator, but
+ * Takes a url and params object like the [standard fetch action creator]{@link https://github.com/redux-effects/redux-effects-fetch#actions}, but
  * adds a url prefix and headers for identity api
  *
  * @function
@@ -363,7 +398,7 @@ export const namedApiFetchWrapper =
 export const identityFetch = namedApiFetchWrapper('identity');
 
 /**
- * Takes a url and params object like the standard fetch action creator, but
+ * Takes a url and params object like the [standard fetch action creator]{@link https://github.com/redux-effects/redux-effects-fetch#actions}, but
  * adds a url prefix and headers for issue api
  *
  * @function
@@ -378,7 +413,7 @@ export const identityFetch = namedApiFetchWrapper('identity');
 export const issueFetch = namedApiFetchWrapper('issue');
 
 /**
- * Takes a url and params object like the standard fetch action creator, but
+ * Takes a url and params object like the [standard fetch action creator]{@link https://github.com/redux-effects/redux-effects-fetch#actions}, but
  * adds a url prefix and headers for encounter api
  *
  * @function
@@ -393,7 +428,7 @@ export const issueFetch = namedApiFetchWrapper('issue');
 export const encounterFetch = namedApiFetchWrapper('encounter');
 
 /**
- * Takes a url and params object like the standard fetch action creator, but
+ * Takes a url and params object like the [standard fetch action creator]{@link https://github.com/redux-effects/redux-effects-fetch#actions}, but
  * adds a url prefix and headers for queue api
  *
  * @function
@@ -408,7 +443,7 @@ export const encounterFetch = namedApiFetchWrapper('encounter');
 export const queueFetch = namedApiFetchWrapper('queue');
 
 /**
- * Takes a url and params object like the standard fetch action creator, but
+ * Takes a url and params object like the [standard fetch action creator]{@link https://github.com/redux-effects/redux-effects-fetch#actions}, but
  * adds a url prefix and headers for ums api
  *
  * @function
