@@ -74,9 +74,7 @@ const applyHandlerByType = cond([
   [T, secondArgument],
 ]);
 
-/**
- * @module redux-utils
- */
+/** @module redux-utils */
 
 /**
  * Given a list of one or more action map objects, return a reducer function
@@ -92,7 +90,6 @@ const applyHandlerByType = cond([
  *                                    type specified as a key in its action map
  *
  * @example
- *
  * const defaultState = {
  *   people: 1,
  *   beasts: 1,
@@ -125,6 +122,9 @@ const applyHandlerByType = cond([
  *
  * reducer({}, vanquishBeast({ weapon: 'broom' }))
  * //=> { people: 1, beasts: 0, weapon: 'broom' }
+ *
+ * reducer({}, succumbToBeast({ lastWords: 'tell my mom...' }))
+ * //=> { people: 0, beasts: 1, lastWords: 'tell my mom...' }
  */
 export function createReducer(defaultState, ...actionMaps) {
   const actionMap = mergeAll(actionMaps);
@@ -144,6 +144,28 @@ export function createReducer(defaultState, ...actionMaps) {
  *                                (state, action) as ordered arguments
  * @return {Function}             A reducer function contstructed by merging
  *                                all given reducer functions
+ *
+ * @example
+ * function reducerA(state, action) {
+ *   return {
+ *     ..state,
+ *     a: action.payload,
+ *   }
+ * }
+ *
+ * function reducerB(state, action) {
+ *   return {
+ *     ..state,
+ *     b: action.payload,
+ *   }
+ * }
+ *
+ * const combined = reduceReducers(reducerA, reducerB)
+ * const defaultState = { sandwich: 'grilled cheese' }
+ * const action = { payload: 'apply me' }
+ *
+ * combined(defaultState, action)
+ * //=> { sandwich: 'grilled cheese', a: 'apply me', b: 'apply me' }
  */
 export function reduceReducers(...reducers) {
   return (previous, current) =>
@@ -261,14 +283,23 @@ const getTicketString = compose(
 );
 
 /**
- * Takes the raw query string portion of a url and returns an equiv object
- * if the string contains a ticket param
+ * Takes the query string portion of a url usually obtained with the
+ * [search property]{@link http://www.w3schools.com/jsref/prop_loc_search.asp}
+ * of js [location]{@link https://developer.mozilla.org/en-US/docs/Web/API/Location}
+ * and returns an object with a `ticket` key value pair
  *
  * @function
  * @param  {String} standard  querystring of a url (anything after '?' character)
  * @return {Object}           An object with a single key 'ticket' that contains
  *                            the ticket param value, or an empty string if no
  *                            ticket param was found in the querystring
+ *
+ * @example
+ * const query = '?flicket=balloon&ticket=mufasa'
+ * getTicket(query) //=> { ticket: 'mufasa' }
+ *
+ * const query = '?flicket=balloon&plicket=mufasa'
+ * getTicket(query) //=> { ticket: '' }
  */
 export const getTicket = compose(
   makeParamObject,
@@ -312,13 +343,26 @@ export const statusFilter = cond([
  *
  * @function
  * @param  {Function} func  the callback to pass data to
- * @return {Function}
+ * @return {Function}       a function handles status codes appropriately and
+ *                            delivers the value.data property to its callback
+ *
+ * @example
+ * import { sum } from 'ramda'
+ *
+ * const apiResponse = {
+ *   status: 200,
+ *   value: {
+ *     data: { numbers: [1, 2, 3] },
+ *   },
+ * }
+ *
+ * const addNumbers = data => sum(data.numbers)
+ * const addNumbersCallback = fetchCallback(addNumbers)
+ *
+ * addNumbersCallback(apiResponse)
+ * //=> 6
  */
 export const fetchCallback = func => compose(func, statusFilter);
-
-/**
- * @module fetch-action-creators
- */
 
 /**
  * Mirror of the redux-effects-fetch action creator
@@ -381,6 +425,8 @@ export const namedApiFetchWrapper =
 
     return standardFetch(finalUrl, finalParams);
   };
+
+/** @module fetch-action-creators */
 
 /**
  * Takes a url and params object like the [standard fetch action creator]{@link https://github.com/redux-effects/redux-effects-fetch#actions}, but
