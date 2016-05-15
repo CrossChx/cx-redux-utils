@@ -74,7 +74,7 @@ const applyHandlerByType = cond([
   [T, secondArgument],
 ]);
 
-/** @module redux-utils */
+/** @module redux-utils/reducers */
 
 /**
  * Given a list of one or more action map objects, return a reducer function
@@ -172,41 +172,55 @@ export function reduceReducers(...reducers) {
     reducers.reduce((p, r) => r(p, current), previous);
 }
 
+/** @module redux-utils/actions */
+
 /**
  * Given the specified type, return a function that creates an object with a
  * specified type, and assign its arguments to a payload object
  *
  * @function
  * @param  {String} type      redux action type name
- * @param  {Object} [payload]   payload data this action
- * @param  {Object} [meta]   meta data for this action
- * @return {Function}         Function that applys a payload and returns an
+ * @return {actionCreator}    Function that applys a payload and returns an
  *                            object of the given action type with the given
  *                            payload
  *
  * @example
  * const BEGIN_GOOD_TIMES = '@@/actionTypes/gootTimes'
  * const beginGoodTimes = createAction(BEGIN_GOOD_TIMES);
- *
- * beginGoodTimes({ soundTrack: 'Jurrasic Park' })
- * //=> {
- * //  type: '@@/actionTypes/gootTimes',
- * //  payload: { soundTrack: 'Jurrasic Park' },
- * //  meta: {},
- * //}
- *
- * beginGoodTimes(
- *   { soundTrack: 'Jurrasic Park' },
- *   { initiatedBy: 'Dr. Malcom' },
- * )
- * //=> {
- * //  type: '@@/actionTypes/gootTimes',
- * //  meta: { initiatedBy: 'Dr. Malcom' },
- * //  payload: { soundTrack: 'Jurrasic Park' },
- * //}
  */
 export const createAction = actionType =>
   (payload = {}, meta = {}) => ({ type: actionType, payload, meta });
+
+  /**
+   * Takes an optional payload and meta object and returns an object
+   * that describes a redux action to be dispatched
+   *
+   * @name actionCreator
+   * @function
+   * @param  {Object} [payload] payload data this action
+   * @param  {Object} [meta]    meta data for this action
+   * @returns {Object}          includes a type string, and optional payload and meta objects
+   *
+   * @example
+   *
+   * const payload = { soundTrack: 'Jurrasic Park' }
+   * beginGoodTimes(payload)
+   * //=> {
+   * //  type: '@@/actionTypes/gootTimes',
+   * //  payload: { soundTrack: 'Jurrasic Park' },
+   * //  meta: {},
+   * //}
+   *
+   * const meta = { initiatedBy: 'Dr. Malcom' }
+   * beginGoodTimes(payload, meta)
+   * //=> {
+   * //  type: '@@/actionTypes/gootTimes',
+   * //  meta: { initiatedBy: 'Dr. Malcom' },
+   * //  payload: { soundTrack: 'Jurrasic Park' },
+   * //}
+   */
+
+/** @module redux-utils/lenses */
 
 /**
  * Wraps ramda's [lensProp]{@link http://ramdajs.com/0.21.0/docs/#lensProp} and
@@ -237,7 +251,11 @@ export const getLens = ifElse(isArrayLike, lensPath, lensProp);
 
 /**
  * Create a [memoized]{@link https://en.wikipedia.org/wiki/Memoization} function
- * that finds and returns specified prop of an object.
+ * that finds and returns specified property of an object. Uses ramda
+ * [lensProp]{@link http://ramdajs.com/0.21.0/docs/#lensProp},
+ * [lensPath]{@link http://ramdajs.com/0.21.0/docs/#lensPath},
+ * [memoize]{@link http://ramdajs.com/0.21.0/docs/#memoize},
+ * and [view]{@link http://ramdajs.com/0.21.0/docs/#view} internally
  *
  * Pass a single string propName for top level key,
  * or an array of propNames for deep nested keys
@@ -261,7 +279,11 @@ export const createSelector = compose(memoize, view, getLens);
 /**
  * Create a [memoized]{@link https://en.wikipedia.org/wiki/Memoization}
  * function that returns a shallow copy of a given object, plus an
- * altered value according the prop it is focused on.
+ * altered value according the property it is focused to. Uses ramda
+ * [lensProp]{@link http://ramdajs.com/0.21.0/docs/#lensProp},
+ * [lensPath]{@link http://ramdajs.com/0.21.0/docs/#lensPath},
+ * [memoize]{@link http://ramdajs.com/0.21.0/docs/#memoize},
+ * and [set]{@link http://ramdajs.com/0.21.0/docs/#set} internally
  *
  * Pass a single string propName for top level key,
  * or an array of propNames for deep nested keys
@@ -441,7 +463,7 @@ export const namedApiFetchWrapper =
     return standardFetch(finalUrl, finalParams);
   };
 
-/** @module fetch-action-creators */
+/** @module fetch-utils/action-creators */
 
 /**
  * Takes a url and params object like the [standard fetch action creator]{@link https://github.com/redux-effects/redux-effects-fetch#actions}, but
