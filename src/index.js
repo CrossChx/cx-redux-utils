@@ -421,6 +421,7 @@ export const fetchCallback = func => compose(func, statusFilter);
 /**
  * Mirror of the [redux-effects-fetch action creator]{@link https://github.com/redux-effects/redux-effects-fetch/blob/master/src/index.js#L97}
  *
+ * @ignore
  * @param  {String}       url     url to send request to
  * @param  {ParamsObject} params  a standard params object
  * @return {FetchAction}          Standard action object with a payload that describes
@@ -428,10 +429,7 @@ export const fetchCallback = func => compose(func, statusFilter);
  */
 const standardFetch = (url = '', params = {}) => ({
   type: 'EFFECT_FETCH',
-  payload: {
-    url,
-    params,
-  },
+  payload: { url, params },
 });
 
 /**
@@ -459,16 +457,48 @@ export const defaultMethodToGet = ifElse(hasMethod, identity, setMethod('GET'));
 export const processParams = compose(defaultMethodToGet, merge);
 
 /**
- * Curryable function to wrap a redux-effects-fetch compliant action creator
- * with the name of a specific api to simplify api from dev perspective
+ * Manually curried function to return a redux-effects-fetch compliant action creator
+ * with the name of a specific api and simplify usage from dev perspective
  *
  * @function
- * @param  {String} apiName   name of the api will both prepend the url and add
- *                            to accept header
- * @param  {String} [suffix]  optional extension for the api name ex. `.api`
- * @param  {String} url       contextual url for request
- * @param  {Object} params    params object for api call, body, method, etc..
- * @return {FetchAction}      Redux-effects-fetch compliant action creator invocation
+ * @param  {String} apiName       name of the api will both prepend the url and
+ *                                add to accept header
+ * @param  {String} [suffix]      optional extension for the api name ex. `.api`
+ * @param  {String} url           contextual url for request
+ * @param  {ParamsObject} params  [params object]{@link ParamsObject} for api
+ *                                call, body, method, etc..
+ * @return {FetchAction}          Redux-effects-fetch compliant action creator
+ *                                invocation
+ *
+ * @example
+ * const beastFetch = namedApiFetchWrapper('test')
+ *
+ * beastFetch('/beasts', {
+ *   method: 'POST',
+ *   body: {
+ *     beastType: 'manticore'
+ *     researchUrl: 'https://en.wikipedia.org/wiki/Manticore',
+ *   },
+ * })
+ * //=> {
+ * //  type: 'EFFECT_FETCH',
+ * //  payload: {
+ * //    url: '/api/beast.api/beasts',
+ * //    params: {
+ * //      method: 'POST',
+ * //      body: {
+ * //        beastType: 'manticore'
+ * //        researchUrl: 'https://en.wikipedia.org/wiki/Manticore',
+ * //      },
+ * //    	 headers: {
+ * //    	   Accept: 'application/x.beast-api.1+json',
+ * //    	   'Content-Type': 'application/json',
+ * //        'cx-app': <from global namespace>,
+ * //        'cx-app-version': <from global namespace>,
+ * //    	 },
+ * //    },
+ * //  },
+ * //}
  */
 export const namedApiFetchWrapper =
   (apiName, suffix = '.api') => (url, params = {}) => {
@@ -484,56 +514,60 @@ export const namedApiFetchWrapper =
  * adds a url prefix and headers for identity api
  *
  * @function
- * @param  {String} url             fetch call is sent to this url
- * @param  {ParamsObject} params  a standard params object
- * @return {FetchAction}            A standard fetch action object with url
- *                                  prefix and headers for identity api
+ * @param  {String} url           fetch call is sent to this url
+ * @param  {ParamsObject} params  A standard [params object]{@link ParamsObject}
+ * @return {FetchAction}          A standard fetch action object with url
+ *                                prefix and headers for identity api
  */
 export const identityFetch = namedApiFetchWrapper('identity');
 
 /**
- * Takes a url and params object like the [standard fetch action creator]{@link https://github.com/redux-effects/redux-effects-fetch#actions}, but
+ * Takes a url and [params object]{@link ParamsObject} like the
+ * [standard fetch action creator]{@link https://github.com/redux-effects/redux-effects-fetch#actions}, but
  * adds a url prefix and headers for issue api
  *
  * @function
- * @param  {String} url             fetch call is sent to this url
- * @param  {ParamsObject} params  a standard params object
- * @return {FetchAction}            A standard fetch action object with url
- *                                  prefix and headers for issue api
+ * @param  {String} url           fetch call is sent to this url
+ * @param  {ParamsObject} params  A standard [params object]{@link ParamsObject}
+ * @return {FetchAction}          A standard fetch action object with url
+ *                                prefix and headers for issue api
  */
 export const issueFetch = namedApiFetchWrapper('issue');
 
 /**
- * Takes a url and params object like the [standard fetch action creator]{@link https://github.com/redux-effects/redux-effects-fetch#actions}, but
+ * Takes a url and [params object]{@link ParamsObject} like the
+ * [standard fetch action creator]{@link https://github.com/redux-effects/redux-effects-fetch#actions}, but
  * adds a url prefix and headers for encounter api
  *
  * @function
- * @param  {String} url             fetch call is sent to this url
- * @param  {ParamsObject} params  a standard params object
- * @return {FetchAction}            A standard fetch action object with url
- *                                  prefix and headers for encounter api
+ * @param  {String} url           fetch call is sent to this url
+ * @param  {ParamsObject} params  A standard [params object]{@link ParamsObject}
+ * @return {FetchAction}          A standard fetch action object with url
+ *                                prefix and headers for encounter api
  */
 export const encounterFetch = namedApiFetchWrapper('encounter');
 
 /**
- * Takes a url and params object like the [standard fetch action creator]{@link https://github.com/redux-effects/redux-effects-fetch#actions}, but
+ * Takes a url and [params object]{@link ParamsObject} like the
+ * [standard fetch action creator]{@link https://github.com/redux-effects/redux-effects-fetch#actions}, but
  * adds a url prefix and headers for queue api
  *
  * @function
- * @param  {String} url             fetch call is sent to this url
- * @param  {ParamsObject} params  a standard params object
- * @return {FetchAction}            A standard fetch action object with url
- *                                  prefix and headers for queue api
+ * @param  {String} url           fetch call is sent to this url
+ * @param  {ParamsObject} params  A standard [params object]{@link ParamsObject}
+ * @return {FetchAction}          A standard fetch action object with url
+ *                                prefix and headers for queue api
  */
 export const queueFetch = namedApiFetchWrapper('queue');
 
 /**
- * Takes a url and params object like the [standard fetch action creator]{@link https://github.com/redux-effects/redux-effects-fetch#actions}, but
+ * Takes a url and [params object]{@link ParamsObject} like the
+ * [standard fetch action creator]{@link https://github.com/redux-effects/redux-effects-fetch#actions}, but
  * adds a url prefix and headers for ums api
  *
  * @function
  * @param  {String} url             fetch call is sent to this url
- * @param  {ParamsObject} params  a standard params object
+ * @param  {ParamsObject} params    A standard [params object]{@link ParamsObject}
  * @return {FetchAction}            A standard fetch action object with url
  *                                  prefix and headers for ums api
  */
