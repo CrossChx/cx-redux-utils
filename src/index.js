@@ -96,7 +96,6 @@ const applyHandlerByType = cond([
  * }
  *
  * const VANQUISH_BEAST = '@@/actionTypes/vanquishBeast';
- * const vanquishBeast = createAction(VANQUISH_BEAST);
  * function vanquishBeastHandler(state, action) {
  *   return {
  *     ...state,
@@ -106,7 +105,6 @@ const applyHandlerByType = cond([
  * }
  *
  * const SUCCUMB_TO_BEAST = '@@/actionTypes/succumbToBeast';
- * const succumbToBeast = createAction(SUCCUMB_TO_BEAST);
  * function succumbToBeastHandler(state, action) {
  *   return {
  *     ...state,
@@ -120,9 +118,11 @@ const applyHandlerByType = cond([
  *   [SUCCUMB_TO_BEAST]: succumbToBeastHandler,
  * })
  *
+ * const vanquishBeast = createAction(VANQUISH_BEAST);
  * reducer({}, vanquishBeast({ weapon: 'broom' }))
  * //=> { people: 1, beasts: 0, weapon: 'broom' }
  *
+ * const succumbToBeast = createAction(SUCCUMB_TO_BEAST);
  * reducer({}, succumbToBeast({ lastWords: 'tell my mom...' }))
  * //=> { people: 0, beasts: 1, lastWords: 'tell my mom...' }
  */
@@ -178,7 +178,8 @@ export function reduceReducers(...reducers) {
  *
  * @function
  * @param  {String} type      redux action type name
- * @param  {Object} optional  payload for this action
+ * @param  {Object} [payload]   payload data this action
+ * @param  {Object} [meta]   meta data for this action
  * @return {Function}         Function that applys a payload and returns an
  *                            object of the given action type with the given
  *                            payload
@@ -188,7 +189,21 @@ export function reduceReducers(...reducers) {
  * const beginGoodTimes = createAction(BEGIN_GOOD_TIMES);
  *
  * beginGoodTimes({ soundTrack: 'Jurrasic Park' })
- * //=> { type: '@@/actionTypes/gootTimes', meta: {}, payload: { soundTrack: 'Jurrasic Park' } }
+ * //=> {
+ * //  type: '@@/actionTypes/gootTimes',
+ * //  payload: { soundTrack: 'Jurrasic Park' },
+ * //  meta: {},
+ * //}
+ *
+ * beginGoodTimes(
+ *   { soundTrack: 'Jurrasic Park' },
+ *   { initiatedBy: 'Dr. Malcom' },
+ * )
+ * //=> {
+ * //  type: '@@/actionTypes/gootTimes',
+ * //  meta: { initiatedBy: 'Dr. Malcom' },
+ * //  payload: { soundTrack: 'Jurrasic Park' },
+ * //}
  */
 export const createAction = actionType =>
   (payload = {}, meta = {}) => ({ type: actionType, payload, meta });
