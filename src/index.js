@@ -232,7 +232,7 @@ export const createAction = actionType =>
  * or
  * ['response', 'data', 'createdAt'] for deep prop
  * @function
- * @param  {*} prop(s) an array for deep prop, or string for top level
+ * @param  {(String|String[])} path an array for deep prop, or string for top level
  * @return {Function}
  *
  * @example
@@ -261,7 +261,7 @@ export const getLens = ifElse(isArrayLike, lensPath, lensProp);
  * or an array of propNames for deep nested keys
  *
  * @function
- * @param  {(String|String[])}  props an array for deep prop, or string for top level
+ * @param  {(String|String[])}  path  an array for deep prop, or string for top level
  * @return {Function}                 function that returns the value of a property
  *                                    at the specified path
  *
@@ -289,10 +289,10 @@ export const createSelector = compose(memoize, view, getLens);
  * or an array of propNames for deep nested keys
  *
  * @function
- * @param  {(String|String[])} props an array of strings for a deep property, or
- *                                   string for top level property
- * @return {Function}                function that returns a clone of an object with a new
- *                                   value set to the property at the specified path
+ * @param  {(String|String[])} path   an array of strings for a deep property, or
+ *                                    string for top level property
+ * @return {Function}                 function that returns a clone of an object with a new
+ *                                    value set to the property at the specified path
  * @example
  * const newVal = 'it is party time'
  *
