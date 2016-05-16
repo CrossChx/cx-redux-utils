@@ -180,9 +180,9 @@ export function reduceReducers(...reducers) {
  *
  * @function
  * @param  {String} type      redux action type name
- * @return {actionCreator}    Function that applys a payload and returns an
- *                            object of the given action type with the given
- *                            payload
+ * @return {actionCreator}    [Action creator]{@link module:actions~actionCreator}
+ *                            function that applys a payload and returns an object
+ *                            of the given action type with the given payload
  *
  * @example
  * const BEGIN_GOOD_TIMES = '@@/actionTypes/gootTimes'
@@ -409,9 +409,9 @@ export const fetchCallback = func => compose(func, statusFilter);
  */
 
 /**
- * Redux action object compatible with
- * [redux-effects-fetch]{@link https://github.com/redux-effects/redux-effects-fetch/blob/master/src/index.js#L97}
- * with a type of 'EFFECT_FETCH', and a payload that describes a [fetch]{@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API} call.
+ * Redux action object compatible with [redux-effects-fetch]{@link https://goo.gl/bG7PO0}
+ * with a type of 'EFFECT_FETCH', and a payload that describes a
+ * [fetch]{@link https://goo.gl/DeFc1M} call.
  *
  * @typedef   {Object}  FetchAction
  * @property  {String}  url         the request url for fetch call
@@ -419,13 +419,14 @@ export const fetchCallback = func => compose(func, statusFilter);
  */
 
 /**
- * Mirror of the [redux-effects-fetch action creator]{@link https://github.com/redux-effects/redux-effects-fetch/blob/master/src/index.js#L97}
+ * Mirror of the [redux-effects-fetch action creator]{@link https://goo.gl/bG7PO0}
  *
  * @ignore
  * @param  {String}       url     url to send request to
  * @param  {ParamsObject} params  a standard params object
- * @return {FetchAction}          Standard action object with a payload that describes
- *                                a [fetch]{@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API} call
+ * @return {FetchAction}          [Fetch action object]{@link module:fetch~FetchAction}
+ *                                with a payload that describes a [fetch]{@link https://goo.gl/DeFc1M}
+ *                                call
  */
 const standardFetch = (url = '', params = {}) => ({
   type: 'EFFECT_FETCH',
@@ -461,14 +462,14 @@ export const processParams = compose(defaultMethodToGet, merge);
  * with the name of a specific api and simplify usage from dev perspective
  *
  * @function
- * @param  {String} apiName       name of the api will both prepend the url and
- *                                add to accept header
- * @param  {String} [suffix]      optional extension for the api name ex. `.api`
- * @param  {String} url           contextual url for request
- * @param  {ParamsObject} params  [params object]{@link ParamsObject} for api
- *                                call, body, method, etc..
- * @return {FetchAction}          Redux-effects-fetch compliant action creator
- *                                invocation
+ * @param  {String}       apiName   name of the api will both prepend the url and
+ *                                	add to accept header
+ * @param  {String}       [suffix]  optional extension for the api name ex. `.api`
+ * @param  {String}       url       contextual url for request
+ * @param  {ParamsObject} params    [params object]{@link module:fetch~ParamsObject} for api
+ *                                  call, body, method, etc..
+ * @return {FetchAction}            [Fetch action object]{@link module:fetch~FetchAction}
+ *                                  with url prefix and headers for encounter api
  *
  * @example
  * const beastFetch = namedApiFetchWrapper('test')
@@ -510,66 +511,66 @@ export const namedApiFetchWrapper =
   };
 
 /**
- * Takes a url and params object like the [standard fetch action creator]{@link https://github.com/redux-effects/redux-effects-fetch#actions}, but
+ * Takes a url and params object like the [standard fetch action creator]{@link https://goo.gl/b3P3BJ}, but
  * adds a url prefix and headers for identity api
  *
  * @function
  * @param  {String} url           fetch call is sent to this url
- * @param  {ParamsObject} params  A standard [params object]{@link ParamsObject}
- * @return {FetchAction}          A standard fetch action object with url
- *                                prefix and headers for identity api
+ * @param  {ParamsObject} params  A standard [params object]{@link module:fetch~ParamsObject}
+ * @return {FetchAction}          A standard [fetch action object]{@link module:fetch~FetchAction}
+ *                                with url prefix and headers for identity api
  */
 export const identityFetch = namedApiFetchWrapper('identity');
 
 /**
- * Takes a url and [params object]{@link ParamsObject} like the
- * [standard fetch action creator]{@link https://github.com/redux-effects/redux-effects-fetch#actions}, but
+ * Takes a url and [params object]{@link module:fetch~ParamsObject} like the
+ * [standard fetch action creator]{@link https://goo.gl/b3P3BJ}, but
  * adds a url prefix and headers for issue api
  *
  * @function
  * @param  {String} url           fetch call is sent to this url
- * @param  {ParamsObject} params  A standard [params object]{@link ParamsObject}
- * @return {FetchAction}          A standard fetch action object with url
- *                                prefix and headers for issue api
+ * @param  {ParamsObject} params  A standard [params object]{@link module:fetch~ParamsObject}
+ * @return {FetchAction}          A standard [fetch action object]{@link module:fetch~FetchAction}
+ *                                with url prefix and headers for issue api
  */
 export const issueFetch = namedApiFetchWrapper('issue');
 
 /**
- * Takes a url and [params object]{@link ParamsObject} like the
- * [standard fetch action creator]{@link https://github.com/redux-effects/redux-effects-fetch#actions}, but
+ * Takes a url and [params object]{@link module:fetch~ParamsObject} like the
+ * [standard fetch action creator]{@link https://goo.gl/b3P3BJ}, but
  * adds a url prefix and headers for encounter api
  *
  * @function
  * @param  {String} url           fetch call is sent to this url
- * @param  {ParamsObject} params  A standard [params object]{@link ParamsObject}
- * @return {FetchAction}          A standard fetch action object with url
- *                                prefix and headers for encounter api
+ * @param  {ParamsObject} params  A standard [params object]{@link module:fetch~ParamsObject}
+ * @return {FetchAction}          A standard [fetch action object]{@link module:fetch~FetchAction}
+ *                                with url prefix and headers for encounter api
  */
 export const encounterFetch = namedApiFetchWrapper('encounter');
 
 /**
- * Takes a url and [params object]{@link ParamsObject} like the
- * [standard fetch action creator]{@link https://github.com/redux-effects/redux-effects-fetch#actions}, but
+ * Takes a url and [params object]{@link module:fetch~ParamsObject} like the
+ * [standard fetch action creator]{@link https://goo.gl/b3P3BJ}, but
  * adds a url prefix and headers for queue api
  *
  * @function
  * @param  {String} url           fetch call is sent to this url
- * @param  {ParamsObject} params  A standard [params object]{@link ParamsObject}
- * @return {FetchAction}          A standard fetch action object with url
- *                                prefix and headers for queue api
+ * @param  {ParamsObject} params  A standard [params object]{@link module:fetch~ParamsObject}
+ * @return {FetchAction}          A standard [fetch action object]{@link module:fetch~FetchAction}
+ *                                with url prefix and headers for queue api
  */
 export const queueFetch = namedApiFetchWrapper('queue');
 
 /**
- * Takes a url and [params object]{@link ParamsObject} like the
- * [standard fetch action creator]{@link https://github.com/redux-effects/redux-effects-fetch#actions}, but
+ * Takes a url and [params object]{@link module:fetch~ParamsObject} like the
+ * [standard fetch action creator]{@link https://goo.gl/b3P3BJ}, but
  * adds a url prefix and headers for ums api
  *
  * @function
  * @param  {String} url             fetch call is sent to this url
- * @param  {ParamsObject} params    A standard [params object]{@link ParamsObject}
- * @return {FetchAction}            A standard fetch action object with url
- *                                  prefix and headers for ums api
+ * @param  {ParamsObject} params    A standard [params object]{@link module:fetch~ParamsObject}
+ * @return {FetchAction}            A standard [fetch action object]{@link module:fetch~FetchAction}
+ *                                  with url prefix and headers for ums api
  */
 export const umsFetch = namedApiFetchWrapper('ums');
 
