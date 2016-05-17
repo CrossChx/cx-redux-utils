@@ -12,7 +12,7 @@ pids
 lib-cov
 
 # Documentation from jsdoc
-docs/cx-redux-utils
+docs
 
 # Coverage directory used by tools like istanbul
 coverage

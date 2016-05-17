@@ -10,7 +10,7 @@
   },
   "scripts": {
     "build-docs": "./node_modules/.bin/jsdoc --configure .jsdoc.json --verbose",
-    "clean-docs": "rm -rf ./docs/cx-redux-utils",
+    "clean-docs": "rm -rf ./docs",
     "compile": "./node_modules/.bin/babel -d lib/ src/",
     "docs": "npm run clean-docs && npm run build-docs",
     "prepublish": "npm run compile",
