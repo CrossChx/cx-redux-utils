@@ -53,7 +53,10 @@ const runErrorCases = callback => {
   });
 };
 
+/** @module tests */
+
 describe('Support functions', () => {
+  /** @name parseIfString */
   describe('#parseIfString', () => {
     const object = { data: 'i am the one you seek' };
 
@@ -83,6 +86,7 @@ describe('Support functions', () => {
     shouldNotThrow(parseIfString, '');
   });
 
+  /** @name hasMethod */
   describe('#hasMethod', () => {
     testCases(hasMethod,
       ['given undefined value at `method`', { method: undefined }, false],
@@ -91,6 +95,7 @@ describe('Support functions', () => {
     );
   });
 
+  /** @name getTicket */
   describe('#getTicket', () => {
     const querystring = '?param1=val1&param2=val2';
     const ticketVal = 'thisIsTheFreakingTicket';
@@ -206,6 +211,7 @@ describe('Redux Utils', () => {
     payload: { actionTestKey: 'actionTestValue' },
   };
 
+  /** @name createReducer */
   describe('#createReducer', () => {
     describe('given a defaultState of type "Object" and an actionMap', () => {
       const defaultStateObject = {
@@ -348,6 +354,7 @@ describe('Redux Utils', () => {
     });
   });
 
+  /** @name reduceReducers */
   describe('#reduceReducers', () => {
     it('combines multiple reducers into a single reducer', () => {
       const reducer = reduceReducers(
@@ -370,6 +377,7 @@ describe('Redux Utils', () => {
     });
   });
 
+  /** @name createAction */
   describe('#createAction', () => {
     describe('given the first arg (specified action Type)', () => {
       const creator = createAction(TEST_ACTION_TYPE);
@@ -420,6 +428,7 @@ describe('Redux Utils', () => {
       },
     };
 
+    /** @name createSelector */
     describe('#createSelector', () => {
       describe('when passed a single prop name', () => {
         const selector = createSelector('simpleKey');
@@ -487,6 +496,7 @@ describe('Redux Utils', () => {
       });
     });
 
+    /** @name createSetter */
     describe('#createSetter', () => {
       describe('when passed a single property name', () => {
         const setter = createSetter('simpleKey');
@@ -540,6 +550,7 @@ describe('Redux Utils', () => {
     });
   });
 
+  /** @name fetchCallback */
   describe('#fetchCallback', () => {
     const target = 'i am the one you seek';
     const url = 'http://www.testy-pants.com';
@@ -601,9 +612,19 @@ describe('Redux Utils', () => {
    * Mostly ensures that each api name does not cause any unforeseen string
    * concatenating issues
    */
+
+  /** @name identityFetch */
   namedApiFetchTest('identity');
+
+  /** @name issueFetch */
   namedApiFetchTest('issue');
+
+  /** @name encounterFetch */
   namedApiFetchTest('encounter');
+
+  /** @name queueFetch */
   namedApiFetchTest('queue');
+
+  /** @name umsFetch */
   namedApiFetchTest('ums');
 });

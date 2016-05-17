@@ -80,6 +80,7 @@ const applyHandlerByType = cond([
  * Given a list of one or more action map objects, return a reducer function
  * to satisfy the reducer signature expected by redux core
  *
+ * @see [tests]{@link module:test~createReducer}
  * @param  {Object}     defaultState  will be passed to the resulting reducer
  *                                    function the first time it is run
  * @param  {...Object}  actionMap     objects in which each key is an action
@@ -140,6 +141,7 @@ export function createReducer(defaultState, ...actionMaps) {
 /**
  * Creates a single reducer from an n length list of reducers
  *
+ * @see [tests]{@link module:test~reduceReducers}
  * @param  {...Function} reducers any number of reducer functions that take
  *                                (state, action) as ordered arguments
  * @return {Function}             A reducer function contstructed by merging
@@ -179,6 +181,7 @@ export function reduceReducers(...reducers) {
  * specified type, and assign its arguments to a payload object
  *
  * @function
+ * @see [tests]{@link module:test~createAction}
  * @param  {String} type      redux action type name
  * @return {actionCreator}    [Action creator]{@link module:actions~actionCreator}
  *                            function that applys a payload and returns an object
@@ -228,10 +231,8 @@ export const createAction = actionType =>
  * that focuses on a top level property if passed a string, and a deep property
  * if passed an array of strings for propPath
  *
- * Ex. 'key' for top level key,
- * or
- * ['response', 'data', 'createdAt'] for deep prop
  * @function
+ * @see [tests]{@link module:test~getLens}
  * @param  {(String|String[])} path an array for deep prop, or string for top level
  * @return {Function}
  *
@@ -261,6 +262,7 @@ export const getLens = ifElse(isArrayLike, lensPath, lensProp);
  * or an array of propNames for deep nested keys
  *
  * @function
+ * @see [tests]{@link module:test~createSelector}
  * @param  {(String|String[])}  path  an array for deep prop, or string for top level
  * @return {Function}                 function that returns the value of a property
  *                                    at the specified path
@@ -289,6 +291,7 @@ export const createSelector = compose(memoize, view, getLens);
  * or an array of propNames for deep nested keys
  *
  * @function
+ * @see [tests]{@link module:test~createSetter}
  * @param  {(String|String[])} path   an array of strings for a deep property, or
  *                                    string for top level property
  * @return {Function}                 function that returns a clone of an object with a new
@@ -326,6 +329,7 @@ const getTicketString = compose(
  * and returns an object with a `ticket` key value pair
  *
  * @function
+ * @see [tests]{@link module:test~getTicket}
  * @param  {String} standard  querystring of a url (anything after '?' character)
  * @return {Object}           An object with a single key 'ticket' that contains
  *                            the ticket param value, or an empty string if no
@@ -377,6 +381,7 @@ export const statusFilter = cond([
  * to the given callback function
  *
  * @function
+ * @see [tests]{@link module:test~fetchCallback}
  * @param  {Function} func  the callback to pass data to
  * @return {Function}       a function handles status codes appropriately and
  *                            delivers the value.data property to its callback
@@ -462,6 +467,7 @@ export const processParams = compose(defaultMethodToGet, merge);
  * with the name of a specific api and simplify usage from dev perspective
  *
  * @function
+ * @see [tests]{@link module:namedApiFetchTest~test}
  * @param  {String}       apiName   name of the api will both prepend the url and
  *                                	add to accept header
  * @param  {String}       [suffix]  optional extension for the api name ex. `.api`

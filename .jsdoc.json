@@ -6,6 +6,7 @@
   "source": {
     "include": [
       "src",
+      "test",
       "package.json",
       "README.md"
     ],
@@ -13,7 +14,8 @@
     "excludePattern": "(node_modules|docs|lib)"
   },
   "plugins": [
-    "plugins/markdown"
+    "plugins/markdown",
+    "node_modules/jsdoc-babel"
   ],
   "templates": {
     "cleverLinks": true,
