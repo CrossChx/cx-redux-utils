@@ -627,4 +627,7 @@ describe('Redux Utils', () => {
 
   /** @name umsFetch */
   namedApiFetchTest('ums');
+
+  /** @name umsFetch */
+  namedApiFetchTest('crossway', '');
 });
