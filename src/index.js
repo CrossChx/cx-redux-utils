@@ -18,7 +18,6 @@ import {
   lensPath,
   lensProp,
   lt,
-  memoize,
   merge,
   mergeAll,
   not,
@@ -276,7 +275,7 @@ export const getLens = ifElse(isArrayLike, lensPath, lensProp);
  * const nestedObj = { a: { b: { c: 'rumble in the bronx' } } }
  * getC(nestedObj) //=> 'rumble in the bronx'
  */
-export const createSelector = compose(memoize, view, getLens);
+export const createSelector = compose(view, getLens);
 
 /**
  * Create a [memoized]{@link https://en.wikipedia.org/wiki/Memoization}
@@ -307,7 +306,7 @@ export const createSelector = compose(memoize, view, getLens);
  * const obj = { a: { b: { c: 'I am bored' } } }
  * setC(newVal, obj) //=> { a: { b: { c: 'it is party time' } } }
  */
-export const createSetter = compose(memoize, set, getLens);
+export const createSetter = compose(set, getLens);
 
 const splitParams = split('&');
 const containsTicket = test(/ticket/);
