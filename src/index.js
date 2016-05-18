@@ -579,10 +579,24 @@ export const queueFetch = namedApiFetchWrapper('queue');
  */
 export const umsFetch = namedApiFetchWrapper('ums');
 
+/**
+ * Takes a url and [params object]{@link module:fetch~ParamsObject} like the
+ * [standard fetch action creator]{@link https://goo.gl/b3P3BJ}, but
+ * adds a url prefix and headers for ums api
+ *
+ * @function
+ * @param  {String} url             fetch call is sent to this url
+ * @param  {ParamsObject} params    A standard [params object]{@link module:fetch~ParamsObject}
+ * @return {FetchAction}            A standard [fetch action object]{@link module:fetch~FetchAction}
+ *                                  with url prefix and headers for ums api
+ */
+export const crosswayFetch = namedApiFetchWrapper('crossway', '');
+
 export default {
   createAction,
   createSelector,
   createSetter,
+  crosswayFetch,
   defaultMethodToGet,
   encodeResponse,
   encounterFetch,
