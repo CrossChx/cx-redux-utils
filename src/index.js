@@ -222,6 +222,48 @@ export const createAction = actionType =>
    * //}
    */
 
+  /**
+   * Given the specified type, and an optional custom error message, return a function
+   * that creates an object with a specified type, adds an error: true key to the
+   * top level, and assigns its arguments to a payload object
+   *
+   * @function
+   * @see [tests]{@link module:test~createErrorAction}
+   * @param  {String} type        redux action type name
+   * @param  {String} [message]   a messge that describes the error, if none is given a
+   *                            	generic message will be used
+   * @return {errorActionCreator} [Action creator]{@link module:actions~actionCreator}
+   *                              function that applys a payload and returns an object
+   *                              of the given action type with the given payload
+   *
+   * @example
+   * const BEGIN_GOOD_TIMES = '@@/actionTypes/gootTimes'
+   * const beginGoodTimes = createAction(BEGIN_GOOD_TIMES);
+   */
+export const createErrorAction = (actionType, message = 'An error occurred') =>
+  (payload = {}) => ({ type: actionType, message, payload, error: true });
+
+  /**
+   * Takes an optional payload and returns an object
+   * that describes an error redux action to be dispatched
+   *
+   * @name errorActionCreator
+   * @function
+   * @param  {Object} [payload] payload data this action
+   * @returns {Object}          includes a type string, and optional payload and meta objects
+   *
+   * @example
+   *
+   * const payload = { soundTrack: 'Jurrasic Park' }
+   * thisDidNotGoWell(payload)
+   * //=> {
+   * //  type: '@@/actionTypes/thisDidNotGoWell',
+   * //  message: 'well something bad happened',
+   * //  payload: { soundTrack: 'Jurrasic Park' },
+   * //  error: true,
+   * //}
+   */
+
 /** @module lenses */
 
 /**
