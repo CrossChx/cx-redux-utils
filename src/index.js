@@ -657,6 +657,7 @@ export const crosswayFetch = namedApiFetchWrapper('crossway', '');
 
 export default {
   createAction,
+  createErrorAction,
   createSelector,
   createSetter,
   crosswayFetch,
