@@ -1,4 +1,7 @@
-import { expect } from 'chai';
+import chai, { expect } from 'chai';
+
+import asPromised from 'chai-as-promised';
+
 import { namedApiFetchTest } from './namedApiFetchTest';
 
 import {
@@ -13,6 +16,9 @@ import {
 
   // Redux utils
   createAction,
+  createThunk,
+  createErrorAction,
+  createErrorThunk,
   createReducer,
   createSelector,
   createSetter,
@@ -35,13 +41,15 @@ import {
   testIfExists,
 } from 'how-the-test-was-won';
 
+chai.use(asPromised);
+
 const runErrorCases = callback => {
   describe('an undefined argument', () => {
-    shouldThrow(callback, undefined, TypeError);
+    shouldNotThrow(callback, undefined);
   });
 
   describe('a null argument', () => {
-    shouldThrow(callback, null, TypeError);
+    shouldNotThrow(callback, null);
   });
 
   describe('an empty object', () => {
@@ -415,6 +423,136 @@ describe('Redux Utils', () => {
     });
   });
 
+  /** @name createThunk */
+  describe('#createThunk', () => {
+    describe('given the first arg (specified action Type)', () => {
+      const creator = createThunk(TEST_ACTION_TYPE);
+
+      describe('the creator function returned', () => {
+        testIfExists(creator);
+        shouldBeAFunction(creator);
+      });
+
+      describe('given a payload passed to the function created, the result', () => {
+        const payload = { testPayloadKey: 'testPayloadVal' };
+        const meta = { testMetaKey: 'testMetaVal' };
+
+        const createdAction = creator(payload, meta);
+
+        it('should be a promise', () => {
+          expect(createdAction).to.be.a('promise');
+        });
+
+        describe('when the resulting thunk is resolved it', () => {
+          it('should resolve with "type" value of TEST_ACTION_TYPE', () => {
+            expect(createdAction).to.eventually.contain.all.keys([{ type: TEST_ACTION_TYPE }]);
+          });
+
+          it('should retain the meta passed to it', () => {
+            expect(createdAction).to.eventually.contain.all.keys([{ meta }]);
+          });
+
+          it('should retain the payload passed to it', () => {
+            expect(createdAction).to.eventually.contain.all.keys({ payload });
+          });
+        });
+      });
+    });
+  });
+
+  /** @name createErrorAction */
+  describe('#createErrorAction', () => {
+    describe('given the first arg (specified action Type)', () => {
+      const message = 'this totally sucked';
+      const creator = createErrorAction(TEST_ACTION_TYPE, message);
+
+      describe('the creator function returned', () => {
+        testIfExists(creator);
+        shouldBeAFunction(creator);
+      });
+
+      describe('given a payload passed to the function created, the result', () => {
+        const payload = { testPayloadKey: 'testPayloadVal' };
+        const meta = { testMetaKey: 'testMetaVal' };
+
+        const createdAction = creator(payload, meta);
+
+        testIfExists(createdAction);
+        shouldBeAnObject(createdAction);
+
+        shouldHaveKeys(createdAction,
+          'type',
+          'meta',
+          'error',
+          'payload',
+          'message',
+        );
+
+        it(`should have a "type" value of ${TEST_ACTION_TYPE}`, () => {
+          expect(createdAction.type).to.equal(TEST_ACTION_TYPE);
+        });
+
+        it('should retain the payload passed to it', () => {
+          expect(createdAction.payload).to.deep.equal(payload);
+        });
+
+        it('should retain the meta passed to it', () => {
+          expect(createdAction.meta).to.deep.equal(meta);
+        });
+
+        it('should have an error key equal to true', () => {
+          expect(createdAction.error).to.equal(true);
+        });
+
+        it(`should have an message key equal to ${message}`, () => {
+          expect(createdAction.message).to.equal(message);
+        });
+      });
+    });
+  });
+
+  /** @name createThunkError */
+  describe('#createErrorThunk', () => {
+    describe('given the first arg (specified action Type)', () => {
+      const message = 'this totally sucked';
+      const creator = createErrorThunk(TEST_ACTION_TYPE, message);
+
+      describe('the creator function returned', () => {
+        testIfExists(creator);
+        shouldBeAFunction(creator);
+      });
+
+      describe('given a payload passed to the function created, the result', () => {
+        const payload = { testPayloadKey: 'testPayloadVal' };
+        const meta = { testMetaKey: 'testMetaVal' };
+
+        const createdAction = creator(payload, meta);
+
+        it('should be a promise', () => {
+          expect(createdAction).to.be.a('promise');
+        });
+
+        describe('when the resulting thunk is resolved it', () => {
+          it(`should resolve with "type" value of ${TEST_ACTION_TYPE}`, () => {
+            expect(createdAction).to.eventually.contain.all.keys([{ type: TEST_ACTION_TYPE }]);
+          });
+
+          it('should retain the meta passed to it', () => {
+            expect(createdAction).to.eventually.contain.all.keys([{ meta }]);
+          });
+
+          it('should retain the payload passed to it', () => {
+            expect(createdAction).to.eventually.contain.all.keys({ payload });
+          });
+
+          it('should retain the message passed to it', () => {
+            expect(createdAction).to.eventually.contain.all.keys({ message });
+          });
+        });
+      });
+    });
+  });
+
   describe('Lens Functions', () => {
     const testObj = {
       simpleKey: 'value',
@@ -552,23 +690,27 @@ describe('Redux Utils', () => {
 
   /** @name fetchCallback */
   describe('#fetchCallback', () => {
-    const target = 'i am the one you seek';
+    const testFetchHandler = (data, meta) => ({ data, meta });
+
+    const data = 'i am the data you seek';
+    const meta = 'i am the data about the data you seek';
     const url = 'http://www.testy-pants.com';
-    const okResponse = {
-      value: '{"data":"i am the one you seek"}',
-      status: 200,
-    };
+
+    const stringData = `"data":"${data}"`;
+    const stringMeta = `"meta":"${meta}"`;
+
+    const value = `{${stringData},${stringMeta}}`;
+    const okResponse = { value, status: 200 };
 
     const noAuthResponse = {
-      value: '{"data":"i am the one you seek"}',
+      value,
+      status: 401,
       headers: {
         get(prop) {
           return prop === 'location' ? url : '';
         },
       },
-      status: 401,
     };
-    const testFetchHandler = data => data;
 
     describe('when passed a valid callback to handle response data', () => {
       const callback = fetchCallback(testFetchHandler);
@@ -584,9 +726,12 @@ describe('Redux Utils', () => {
 
           shouldNotThrow(callback, okResponse);
           testIfExists(result);
-          shouldBeAString(result);
-          it('should correctly return the target property and process it', () => {
-            expect(result).to.equal(target);
+          shouldBeAnObject(result);
+
+          shouldHaveKeys(result, 'data', 'meta');
+
+          it('should correctly return the data property and process it', () => {
+            expect(result).to.deep.equal({ data, meta });
           });
         });
 
@@ -595,12 +740,14 @@ describe('Redux Utils', () => {
 
           testIfExists(result);
           shouldBeAnObject(result);
-          it('should have a redirect_to key', () => {
-            expect(result).to.have.all.keys('redirect_to');
-          });
+          shouldHaveKeys(result, 'data', 'meta');
+          shouldHaveKeys(result.data, 'redirect_to');
 
           it('should return the expected result', () => {
-            expect(result).to.deep.equal({ redirect_to: url });
+            expect(result).to.deep.equal({
+              meta: {},
+              data: { redirect_to: url },
+            });
           });
         });
       });
