@@ -437,23 +437,31 @@ describe('Redux Utils', () => {
         const payload = { testPayloadKey: 'testPayloadVal' };
         const meta = { testMetaKey: 'testMetaVal' };
 
+        const dispatch = d => d;
         const createdAction = creator(payload, meta);
 
-        it('should be a promise', () => {
-          expect(createdAction).to.be.a('promise');
-        });
+        testIfExists(createdAction);
+        shouldBeAFunction(createdAction);
+
+        const createdActionResult = createdAction(dispatch);
 
         describe('when the resulting thunk is resolved it', () => {
+          it('should be a promise', () => {
+            expect(createdActionResult).to.be.a('promise');
+          });
+
           it('should resolve with "type" value of TEST_ACTION_TYPE', () => {
-            expect(createdAction).to.eventually.contain.all.keys([{ type: TEST_ACTION_TYPE }]);
+            expect(createdActionResult).to.eventually.contain.all.keys([{
+              type: TEST_ACTION_TYPE,
+            }]);
           });
 
           it('should retain the meta passed to it', () => {
-            expect(createdAction).to.eventually.contain.all.keys([{ meta }]);
+            expect(createdActionResult).to.eventually.contain.all.keys([{ meta }]);
           });
 
           it('should retain the payload passed to it', () => {
-            expect(createdAction).to.eventually.contain.all.keys({ payload });
+            expect(createdActionResult).to.eventually.contain.all.keys({ payload });
           });
         });
       });
@@ -526,27 +534,35 @@ describe('Redux Utils', () => {
         const payload = { testPayloadKey: 'testPayloadVal' };
         const meta = { testMetaKey: 'testMetaVal' };
 
+        const dispatch = d => d;
         const createdAction = creator(payload, meta);
 
-        it('should be a promise', () => {
-          expect(createdAction).to.be.a('promise');
-        });
+        testIfExists(createdAction);
+        shouldBeAFunction(createdAction);
+
+        const createdActionResult = createdAction(dispatch);
 
         describe('when the resulting thunk is resolved it', () => {
+          it('should be a promise', () => {
+            expect(createdActionResult).to.be.a('promise');
+          });
+
           it(`should resolve with "type" value of ${TEST_ACTION_TYPE}`, () => {
-            expect(createdAction).to.eventually.contain.all.keys([{ type: TEST_ACTION_TYPE }]);
+            expect(createdActionResult).to.eventually.contain.all.keys([{
+              type: TEST_ACTION_TYPE,
+            }]);
           });
 
           it('should retain the meta passed to it', () => {
-            expect(createdAction).to.eventually.contain.all.keys([{ meta }]);
+            expect(createdActionResult).to.eventually.contain.all.keys([{ meta }]);
           });
 
           it('should retain the payload passed to it', () => {
-            expect(createdAction).to.eventually.contain.all.keys({ payload });
+            expect(createdActionResult).to.eventually.contain.all.keys({ payload });
           });
 
           it('should retain the message passed to it', () => {
-            expect(createdAction).to.eventually.contain.all.keys({ message });
+            expect(createdActionResult).to.eventually.contain.all.keys({ message });
           });
         });
       });
