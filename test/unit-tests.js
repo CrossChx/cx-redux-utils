@@ -1,4 +1,7 @@
-import { expect } from 'chai';
+import chai, { expect } from 'chai';
+
+import asPromised from 'chai-as-promised';
+
 import { namedApiFetchTest } from './namedApiFetchTest';
 
 import {
@@ -13,6 +16,9 @@ import {
 
   // Redux utils
   createAction,
+  createThunk,
+  createErrorAction,
+  createErrorThunk,
   createReducer,
   createSelector,
   createSetter,
@@ -34,6 +40,8 @@ import {
   testCases,
   testIfExists,
 } from 'how-the-test-was-won';
+
+chai.use(asPromised);
 
 const runErrorCases = callback => {
   describe('an undefined argument', () => {
@@ -410,6 +418,136 @@ describe('Redux Utils', () => {
 
         it('should retain the meta passed to it', () => {
           expect(createdAction.meta).to.deep.equal(meta);
+        });
+      });
+    });
+  });
+
+  /** @name createThunk */
+  describe('#createThunk', () => {
+    describe('given the first arg (specified action Type)', () => {
+      const creator = createThunk(TEST_ACTION_TYPE);
+
+      describe('the creator function returned', () => {
+        testIfExists(creator);
+        shouldBeAFunction(creator);
+      });
+
+      describe('given a payload passed to the function created, the result', () => {
+        const payload = { testPayloadKey: 'testPayloadVal' };
+        const meta = { testMetaKey: 'testMetaVal' };
+
+        const createdAction = creator(payload, meta);
+
+        it('should be a promise', () => {
+          expect(createdAction).to.be.a('promise');
+        });
+
+        describe('when the resulting thunk is resolved it', () => {
+          it('should resolve with "type" value of TEST_ACTION_TYPE', () => {
+            expect(createdAction).to.eventually.contain.all.keys([{ type: TEST_ACTION_TYPE }]);
+          });
+
+          it('should retain the meta passed to it', () => {
+            expect(createdAction).to.eventually.contain.all.keys([{ meta }]);
+          });
+
+          it('should retain the payload passed to it', () => {
+            expect(createdAction).to.eventually.contain.all.keys({ payload });
+          });
+        });
+      });
+    });
+  });
+
+  /** @name createErrorAction */
+  describe('#createErrorAction', () => {
+    describe('given the first arg (specified action Type)', () => {
+      const message = 'this totally sucked';
+      const creator = createErrorAction(TEST_ACTION_TYPE, message);
+
+      describe('the creator function returned', () => {
+        testIfExists(creator);
+        shouldBeAFunction(creator);
+      });
+
+      describe('given a payload passed to the function created, the result', () => {
+        const payload = { testPayloadKey: 'testPayloadVal' };
+        const meta = { testMetaKey: 'testMetaVal' };
+
+        const createdAction = creator(payload, meta);
+
+        testIfExists(createdAction);
+        shouldBeAnObject(createdAction);
+
+        shouldHaveKeys(createdAction,
+          'type',
+          'meta',
+          'error',
+          'payload',
+          'message',
+        );
+
+        it(`should have a "type" value of ${TEST_ACTION_TYPE}`, () => {
+          expect(createdAction.type).to.equal(TEST_ACTION_TYPE);
+        });
+
+        it('should retain the payload passed to it', () => {
+          expect(createdAction.payload).to.deep.equal(payload);
+        });
+
+        it('should retain the meta passed to it', () => {
+          expect(createdAction.meta).to.deep.equal(meta);
+        });
+
+        it('should have an error key equal to true', () => {
+          expect(createdAction.error).to.equal(true);
+        });
+
+        it(`should have an message key equal to ${message}`, () => {
+          expect(createdAction.message).to.equal(message);
+        });
+      });
+    });
+  });
+
+  /** @name createThunkError */
+  describe('#createErrorThunk', () => {
+    describe('given the first arg (specified action Type)', () => {
+      const message = 'this totally sucked';
+      const creator = createErrorThunk(TEST_ACTION_TYPE, message);
+
+      describe('the creator function returned', () => {
+        testIfExists(creator);
+        shouldBeAFunction(creator);
+      });
+
+      describe('given a payload passed to the function created, the result', () => {
+        const payload = { testPayloadKey: 'testPayloadVal' };
+        const meta = { testMetaKey: 'testMetaVal' };
+
+        const createdAction = creator(payload, meta);
+
+        it('should be a promise', () => {
+          expect(createdAction).to.be.a('promise');
+        });
+
+        describe('when the resulting thunk is resolved it', () => {
+          it(`should resolve with "type" value of ${TEST_ACTION_TYPE}`, () => {
+            expect(createdAction).to.eventually.contain.all.keys([{ type: TEST_ACTION_TYPE }]);
+          });
+
+          it('should retain the meta passed to it', () => {
+            expect(createdAction).to.eventually.contain.all.keys([{ meta }]);
+          });
+
+          it('should retain the payload passed to it', () => {
+            expect(createdAction).to.eventually.contain.all.keys({ payload });
+          });
+
+          it('should retain the message passed to it', () => {
+            expect(createdAction).to.eventually.contain.all.keys({ message });
+          });
         });
       });
     });

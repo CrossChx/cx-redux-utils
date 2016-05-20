@@ -182,6 +182,13 @@ export function reduceReducers(...reducers) {
 
 /** @module actions */
 
+export const returnActionResult =
+  (actionType, payload = {}, meta = {}) => ({
+    type: actionType,
+    payload,
+    meta,
+  });
+
 /**
  * Given the specified type, return a function that creates an object with a
  * specified type, and assign its arguments to a payload object
@@ -197,8 +204,12 @@ export function reduceReducers(...reducers) {
  * const BEGIN_GOOD_TIMES = '@@/actionTypes/gootTimes'
  * const beginGoodTimes = createAction(BEGIN_GOOD_TIMES);
  */
+
 export const createAction = actionType =>
-  (payload = {}, meta = {}) => ({ type: actionType, payload, meta });
+  (payload, meta) => returnActionResult(actionType, payload, meta);
+
+export const createThunk = actionType =>
+  (payload, meta) => Promise.resolve(returnActionResult(actionType, payload, meta));
 
   /**
    * Takes an optional payload and meta object and returns an object
@@ -229,6 +240,15 @@ export const createAction = actionType =>
    * //}
    */
 
+export const returnErrorResult =
+  (actionType, message = 'An error occurred', payload = {}, meta = {}) => ({
+    type: actionType,
+    error: true,
+    message,
+    payload,
+    meta,
+  });
+
   /**
    * Given the specified type, and an optional custom error message, return a function
    * that creates an object with a specified type, adds an error: true key to the
@@ -247,8 +267,11 @@ export const createAction = actionType =>
    * const BEGIN_GOOD_TIMES = '@@/actionTypes/gootTimes'
    * const beginGoodTimes = createAction(BEGIN_GOOD_TIMES);
    */
-export const createErrorAction = (actionType, message = 'An error occurred') =>
-  (payload = {}) => ({ type: actionType, message, payload, error: true });
+export const createErrorAction = (actionType, message) =>
+  (payload, meta) => returnErrorResult(actionType, message, payload, meta);
+
+export const createErrorThunk = (actionType, message) =>
+  (payload, meta) => Promise.reject(returnErrorResult(actionType, message, payload, meta));
 
   /**
    * Takes an optional payload and returns an object
@@ -656,33 +679,37 @@ export const umsFetch = namedApiFetchWrapper('ums');
 export const crosswayFetch = namedApiFetchWrapper('crossway', '');
 
 export default {
+  returnActionResult,
   createAction,
+  createThunk,
+  returnErrorResult,
   createErrorAction,
+  createErrorThunk,
+  getLens,
   createSelector,
   createSetter,
-  crosswayFetch,
-  defaultMethodToGet,
-  encodeResponse,
-  encounterFetch,
-  fetchCallback,
-  getHeaders,
-  getLens,
-  getRedirect,
   getTicket,
-  hasMethod,
-  identityFetch,
-  issueFetch,
-  namedApiFetchWrapper,
-  parse,
-  parseIfString,
-  processParams,
-  queueFetch,
+  statusIs,
+  statusCodeSatisfies,
   statusCodeComparator,
   statusCodeGTE,
   statusCodeLT,
-  statusCodeSatisfies,
-  statusFilter,
-  statusIs,
   statusWithinRange,
+  parse,
+  parseIfString,
+  encodeResponse,
+  getHeaders,
+  getRedirect,
+  statusFilter,
+  fetchCallback,
+  hasMethod,
+  defaultMethodToGet,
+  processParams,
+  namedApiFetchWrapper,
+  identityFetch,
+  issueFetch,
+  encounterFetch,
+  queueFetch,
   umsFetch,
+  crosswayFetch,
 };
