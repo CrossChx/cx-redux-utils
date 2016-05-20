@@ -208,7 +208,10 @@ export const createAction = actionType =>
   (payload, meta) => returnActionResult(actionType, payload, meta);
 
 export const createThunk = actionType =>
-  (payload, meta) => Promise.resolve(returnActionResult(actionType, payload, meta));
+  (payload, meta) => dispatch =>
+    Promise.resolve(dispatch(
+      returnActionResult(actionType, payload, meta)
+    ));
 
   /**
    * Takes an optional payload and meta object and returns an object
@@ -270,7 +273,10 @@ export const createErrorAction = (actionType, message) =>
   (payload, meta) => returnErrorResult(actionType, message, payload, meta);
 
 export const createErrorThunk = (actionType, message) =>
-  (payload, meta) => Promise.reject(returnErrorResult(actionType, message, payload, meta));
+  (payload, meta) => dispatch =>
+    Promise.reject(dispatch(
+      returnErrorResult(actionType, message, payload, meta)
+    ));
 
   /**
    * Takes an optional payload and returns an object
