@@ -37,11 +37,11 @@ import {
 
 const runErrorCases = callback => {
   describe('an undefined argument', () => {
-    shouldThrow(callback, undefined, TypeError);
+    shouldNotThrow(callback, undefined);
   });
 
   describe('a null argument', () => {
-    shouldThrow(callback, null, TypeError);
+    shouldNotThrow(callback, null);
   });
 
   describe('an empty object', () => {
@@ -552,23 +552,27 @@ describe('Redux Utils', () => {
 
   /** @name fetchCallback */
   describe('#fetchCallback', () => {
-    const target = 'i am the one you seek';
+    const testFetchHandler = (data, meta) => ({ data, meta });
+
+    const data = 'i am the data you seek';
+    const meta = 'i am the data about the data you seek';
     const url = 'http://www.testy-pants.com';
-    const okResponse = {
-      value: '{"data":"i am the one you seek"}',
-      status: 200,
-    };
+
+    const stringData = `"data":"${data}"`;
+    const stringMeta = `"meta":"${meta}"`;
+
+    const value = `{${stringData},${stringMeta}}`;
+    const okResponse = { value, status: 200 };
 
     const noAuthResponse = {
-      value: '{"data":"i am the one you seek"}',
+      value,
+      status: 401,
       headers: {
         get(prop) {
           return prop === 'location' ? url : '';
         },
       },
-      status: 401,
     };
-    const testFetchHandler = data => data;
 
     describe('when passed a valid callback to handle response data', () => {
       const callback = fetchCallback(testFetchHandler);
@@ -584,9 +588,12 @@ describe('Redux Utils', () => {
 
           shouldNotThrow(callback, okResponse);
           testIfExists(result);
-          shouldBeAString(result);
-          it('should correctly return the target property and process it', () => {
-            expect(result).to.equal(target);
+          shouldBeAnObject(result);
+
+          shouldHaveKeys(result, 'data', 'meta');
+
+          it('should correctly return the data property and process it', () => {
+            expect(result).to.deep.equal({ data, meta });
           });
         });
 
@@ -595,12 +602,14 @@ describe('Redux Utils', () => {
 
           testIfExists(result);
           shouldBeAnObject(result);
-          it('should have a redirect_to key', () => {
-            expect(result).to.have.all.keys('redirect_to');
-          });
+          shouldHaveKeys(result, 'data', 'meta');
+          shouldHaveKeys(result.data, 'redirect_to');
 
           it('should return the expected result', () => {
-            expect(result).to.deep.equal({ redirect_to: url });
+            expect(result).to.deep.equal({
+              meta: {},
+              data: { redirect_to: url },
+            });
           });
         });
       });

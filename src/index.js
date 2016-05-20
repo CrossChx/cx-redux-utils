@@ -3,8 +3,10 @@ import {
   and,
   compose,
   cond,
+  converge,
   curry,
   defaultTo,
+  either,
   equals,
   find,
   flip,
@@ -12,8 +14,8 @@ import {
   gte,
   identity,
   ifElse,
-  isEmpty,
   isArrayLike,
+  isEmpty,
   isNil,
   lensPath,
   lensProp,
@@ -24,6 +26,7 @@ import {
   nthArg,
   objOf,
   of,
+  or,
   pathSatisfies,
   prop,
   propEq,
@@ -36,7 +39,11 @@ import {
   view,
 } from 'ramda';
 
-const exists = compose(not, isNil);
+const isNilOrEmpty = or(isNil, isEmpty);
+const notNil = compose(not, isNil);
+const notEmpty = compose(not, isEmpty);
+const exists = and(notEmpty, notNil);
+
 const emptyObject = always({});
 const getPropOrEmptyObjectFunction = propOr(emptyObject);
 const getPropOrEmptyString = propOr('');
@@ -398,25 +405,25 @@ export const statusCodeSatisfies = predicate => compose(predicate, prop('status'
 export const statusCodeComparator = comp => compose(statusCodeSatisfies, flip(comp));
 export const statusCodeGTE = statusCodeComparator(gte);
 export const statusCodeLT = statusCodeComparator(lt);
-export const statusWithinRange = curry(
-  (l, h) => and(statusCodeGTE(l), statusCodeLT(h))
+export const statusWithinRange = curry((lowestCode, hightestCode) =>
+  and(statusCodeGTE(lowestCode), statusCodeLT(hightestCode))
 );
 
 // Response handling support functions
 export const parse = s => JSON.parse(isEmpty(s) ? '{}' : s);
 export const parseIfString = ifElse(typeIs('String'), parse, identity);
 export const encodeResponse = compose(parseIfString, prop('value'));
-export const getFetchData = createSelector('data');
-export const getFetchResponse = compose(getFetchData, encodeResponse);
-
 export const getHeaders = data => data.headers.get('location');
 export const getRedirect = compose(objOf('redirect_to'), getHeaders);
 
 export const statusFilter = cond([
+  [isNilOrEmpty, emptyObject],
   [statusIs(401), getRedirect],
-  [statusWithinRange(200, 300), getFetchResponse],
+  [statusWithinRange(200, 300), encodeResponse],
 ]);
 
+const safeData = either(propOr(undefined, 'data'), identity);
+const safeMeta = propOr({}, 'meta');
 /**
  * Returns a function that passes the value.data property expected fetch result
  * to the given callback function
@@ -433,7 +440,12 @@ export const statusFilter = cond([
  * const apiResponse = {
  *   status: 200,
  *   value: {
- *     data: { numbers: [1, 2, 3] },
+ *     data: {
+ *       numbers: [1, 2, 3]
+ *     },
+ *     meta: {
+ *       numbers: [1, 2, 3]
+ *     },
  *   },
  * }
  *
@@ -442,8 +454,17 @@ export const statusFilter = cond([
  *
  * addNumbersCallback(apiResponse)
  * //=> 6
+ *
+ * const addNumbersWithMeta = (data, meta) => sum([...data.numbers, ...meta.numbers])
+ * const addNumbersWithMetaCallback = fetchCallback(addNumbersWithMeta)
+ *
+ * addNumbersWithMetaCallback(apiResponse)
+ * //=> 12
  */
-export const fetchCallback = func => compose(func, statusFilter);
+export const fetchCallback = func => compose(
+  converge(func, [safeData, safeMeta]),
+  statusFilter,
+);
 
 /**
  * A standard fetch request params object
@@ -643,8 +664,6 @@ export default {
   encodeResponse,
   encounterFetch,
   fetchCallback,
-  getFetchData,
-  getFetchResponse,
   getHeaders,
   getLens,
   getRedirect,
