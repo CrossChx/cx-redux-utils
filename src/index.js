@@ -204,7 +204,6 @@ export const returnActionResult =
  * const BEGIN_GOOD_TIMES = '@@/actionTypes/gootTimes'
  * const beginGoodTimes = createAction(BEGIN_GOOD_TIMES);
  */
-
 export const createAction = actionType =>
   (payload, meta) => returnActionResult(actionType, payload, meta);
 
