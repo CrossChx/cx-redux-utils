@@ -560,7 +560,7 @@ export const processParams = compose(defaultMethodToGet, merge);
  * @see [tests]{@link module:namedApiFetchTest~test}
  * @param  {String}       apiName   name of the api will both prepend the url and
  *                                	add to accept header
- * @param  {String}       [suffix]  optional extension for the api name ex. `.api`
+ * @param  {String}       [suffix]  optional extension for the api name ex. `-api`
  * @param  {String}       url       contextual url for request
  * @param  {ParamsObject} params    [params object]{@link module:fetch~ParamsObject} for api
  *                                  call, body, method, etc..
@@ -580,7 +580,7 @@ export const processParams = compose(defaultMethodToGet, merge);
  * //=> {
  * //  type: 'EFFECT_FETCH',
  * //  payload: {
- * //    url: '/api/beast.api/beasts',
+ * //    url: '/api/beast-api/beasts',
  * //    params: {
  * //      method: 'POST',
  * //      body: {
@@ -598,7 +598,7 @@ export const processParams = compose(defaultMethodToGet, merge);
  * //}
  */
 export const namedApiFetchWrapper =
-  (apiName, suffix = '.api') => (url, params = {}) => {
+  (apiName, suffix = '-api') => (url, params = {}) => {
     const finalUrl = `/api/${apiName}${suffix}${url}`;
     const headers = headersWithNamedAccept(apiName);
     const finalParams = processParams(params, headers);
