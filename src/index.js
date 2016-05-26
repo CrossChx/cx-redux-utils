@@ -14,6 +14,7 @@ import {
   gte,
   identity,
   ifElse,
+  is,
   isArrayLike,
   isEmpty,
   isNil,
@@ -43,6 +44,8 @@ const isNilOrEmpty = or(isNil, isEmpty);
 const notNil = compose(not, isNil);
 const notEmpty = compose(not, isEmpty);
 const exists = and(notEmpty, notNil);
+
+const orEmptyObject = defaultTo({});
 
 const emptyObject = always({});
 const getPropOrEmptyObjectFunction = propOr(emptyObject);
@@ -182,11 +185,21 @@ export function reduceReducers(...reducers) {
 
 /** @module actions */
 
+/**
+ * Takes a type, optional message, optional payload value, and an optional meta value
+ * and returns a standard redux action object descriptive of a redux action
+ *
+ * @function
+ * @param   {String}  actionType  type string for action
+ * @param   {*}       [payload]   data relevant to error
+ * @param   {*}       [meta]      data to describe the payload
+ * @returns {Object}              standard action object
+ */
 export const returnActionResult =
   (actionType, payload = {}, meta = {}) => ({
     type: actionType,
-    payload,
-    meta,
+    payload: orEmptyObject(payload),
+    meta: orEmptyObject(meta),
   });
 
 /**
@@ -213,62 +226,77 @@ export const createThunk = actionType =>
       returnActionResult(actionType, payload, meta)
     ));
 
-  /**
-   * Takes an optional payload and meta object and returns an object
-   * that describes a redux action to be dispatched
-   *
-   * @name actionCreator
-   * @function
-   * @param  {Object} [payload] payload data this action
-   * @param  {Object} [meta]    meta data for this action
-   * @returns {Object}          includes a type string, and optional payload and meta objects
-   *
-   * @example
-   *
-   * const payload = { soundTrack: 'Jurrasic Park' }
-   * beginGoodTimes(payload)
-   * //=> {
-   * //  type: '@@/actionTypes/gootTimes',
-   * //  payload: { soundTrack: 'Jurrasic Park' },
-   * //  meta: {},
-   * //}
-   *
-   * const meta = { initiatedBy: 'Dr. Malcom' }
-   * beginGoodTimes(payload, meta)
-   * //=> {
-   * //  type: '@@/actionTypes/gootTimes',
-   * //  meta: { initiatedBy: 'Dr. Malcom' },
-   * //  payload: { soundTrack: 'Jurrasic Park' },
-   * //}
-   */
+/**
+ * Takes an optional payload and meta object and returns an object
+ * that describes a redux action to be dispatched
+ *
+ * A empty object default functino is used for both meta and
+ * payload to handle cases where a null is passed as either
+ * rather than an undefined
+ *
+ * @name actionCreator
+ * @function
+ * @param  {Object} [payload] payload data this action
+ * @param  {Object} [meta]    meta data for this action
+ * @returns {Object}          includes a type string, and optional payload and meta objects
+ *
+ * @example
+ *
+ * const payload = { soundTrack: 'Jurrasic Park' }
+ * beginGoodTimes(payload)
+ * //=> {
+ * //  type: '@@/actionTypes/gootTimes',
+ * //  payload: { soundTrack: 'Jurrasic Park' },
+ * //  meta: {},
+ * //}
+ *
+ * const meta = { initiatedBy: 'Dr. Malcom' }
+ * beginGoodTimes(payload, meta)
+ * //=> {
+ * //  type: '@@/actionTypes/gootTimes',
+ * //  meta: { initiatedBy: 'Dr. Malcom' },
+ * //  payload: { soundTrack: 'Jurrasic Park' },
+ * //}
+ */
 
+/**
+ * Takes a type, optional message, optional payload value, and an optional meta value
+ * and returns a standard redux action object descriptive of a problem in execution
+ *
+ * @function
+ * @param   {String}  actionType  type string for action
+ * @param   {String}  [message]   description of the error
+ * @param   {*}       [payload]   data relevant to error
+ * @param   {*}       [meta]      data to describe the payload
+ * @returns {Object}              standard action object
+ */
 export const returnErrorResult =
   (actionType, message = 'An error occurred', payload = {}, meta = {}) => ({
     type: actionType,
     error: true,
     message,
-    payload,
-    meta,
+    payload: orEmptyObject(payload),
+    meta: orEmptyObject(meta),
   });
 
-  /**
-   * Given the specified type, and an optional custom error message, return a function
-   * that creates an object with a specified type, adds an error: true key to the
-   * top level, and assigns its arguments to a payload object
-   *
-   * @function
-   * @see [tests]{@link module:test~createErrorAction}
-   * @param  {String} type        redux action type name
-   * @param  {String} [message]   a messge that describes the error, if none is given a
-   *                            	generic message will be used
-   * @return {errorActionCreator} [Action creator]{@link module:actions~actionCreator}
-   *                              function that applys a payload and returns an object
-   *                              of the given action type with the given payload
-   *
-   * @example
-   * const BEGIN_GOOD_TIMES = '@@/actionTypes/gootTimes'
-   * const beginGoodTimes = createAction(BEGIN_GOOD_TIMES);
-   */
+/**
+ * Given the specified type, and an optional custom error message, return a function
+ * that creates an object with a specified type, adds an error: true key to the
+ * top level, and assigns its arguments to a payload object
+ *
+ * @function
+ * @see [tests]{@link module:test~createErrorAction}
+ * @param  {String} type        redux action type name
+ * @param  {String} [message]   a messge that describes the error, if none is given a
+ *                            	generic message will be used
+ * @return {errorActionCreator} [Action creator]{@link module:actions~actionCreator}
+ *                              function that applys a payload and returns an object
+ *                              of the given action type with the given payload
+ *
+ * @example
+ * const BEGIN_GOOD_TIMES = '@@/actionTypes/gootTimes'
+ * const beginGoodTimes = createAction(BEGIN_GOOD_TIMES);
+ */
 export const createErrorAction = (actionType, message) =>
   (payload, meta) => returnErrorResult(actionType, message, payload, meta);
 
@@ -278,26 +306,26 @@ export const createErrorThunk = (actionType, message) =>
       returnErrorResult(actionType, message, payload, meta)
     ));
 
-  /**
-   * Takes an optional payload and returns an object
-   * that describes an error redux action to be dispatched
-   *
-   * @name errorActionCreator
-   * @function
-   * @param  {Object} [payload] payload data this action
-   * @returns {Object}          includes a type string, and optional payload and meta objects
-   *
-   * @example
-   *
-   * const payload = { soundTrack: 'Jurrasic Park' }
-   * thisDidNotGoWell(payload)
-   * //=> {
-   * //  type: '@@/actionTypes/thisDidNotGoWell',
-   * //  message: 'well something bad happened',
-   * //  payload: { soundTrack: 'Jurrasic Park' },
-   * //  error: true,
-   * //}
-   */
+/**
+ * Takes an optional payload and returns an object
+ * that describes an error redux action to be dispatched
+ *
+ * @name errorActionCreator
+ * @function
+ * @param  {Object} [payload] payload data this action
+ * @returns {Object}          includes a type string, and optional payload and meta objects
+ *
+ * @example
+ *
+ * const payload = { soundTrack: 'Jurrasic Park' }
+ * thisDidNotGoWell(payload)
+ * //=> {
+ * //  type: '@@/actionTypes/thisDidNotGoWell',
+ * //  message: 'well something bad happened',
+ * //  payload: { soundTrack: 'Jurrasic Park' },
+ * //  error: true,
+ * //}
+ */
 
 /** @module lenses */
 
@@ -450,6 +478,7 @@ export const statusFilter = cond([
   [statusWithinRange(200, 300), encodeResponse],
 ]);
 
+const actionCreatorOrNew = ifElse(is(Function), identity, createAction);
 const safeData = either(propOr(undefined, 'data'), identity);
 const safeMeta = propOr({}, 'meta');
 /**
@@ -490,7 +519,7 @@ const safeMeta = propOr({}, 'meta');
  * //=> 12
  */
 export const fetchCallback = func => compose(
-  converge(func, [safeData, safeMeta]),
+  converge(actionCreatorOrNew(func), [safeData, safeMeta]),
   statusFilter,
 );
 
