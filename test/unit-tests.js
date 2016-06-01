@@ -479,7 +479,7 @@ describe('Redux Utils', () => {
         shouldBeAFunction(creator);
       });
 
-      describe('given a payload passed to the function created, the result', () => {
+      describe('when a payload passed to the function created, the result', () => {
         const payload = { testPayloadKey: 'testPayloadVal' };
         const meta = { testMetaKey: 'testMetaVal' };
 
@@ -506,6 +506,33 @@ describe('Redux Utils', () => {
 
         it('should retain the meta passed to it', () => {
           expect(createdAction.meta).to.deep.equal(meta);
+        });
+
+        it('should have an error key equal to true', () => {
+          expect(createdAction.error).to.equal(true);
+        });
+
+        it(`should have an message key equal to ${message}`, () => {
+          expect(createdAction.message).to.equal(message);
+        });
+      });
+
+      describe('when a null payload is passed to the function created, the result', () => {
+        const createdAction = creator(null, null);
+
+        testIfExists(createdAction);
+        shouldBeAnObject(createdAction);
+
+        shouldHaveKeys(createdAction,
+          'type',
+          'meta',
+          'error',
+          'payload',
+          'message',
+        );
+
+        it(`should have a "type" value of ${TEST_ACTION_TYPE}`, () => {
+          expect(createdAction.type).to.equal(TEST_ACTION_TYPE);
         });
 
         it('should have an error key equal to true', () => {
@@ -728,9 +755,12 @@ describe('Redux Utils', () => {
       },
     };
 
-    describe('when passed a valid callback to handle response data', () => {
-      const callback = fetchCallback(testFetchHandler);
-
+    const testCallback = ({
+      callback,
+      keys,
+      redirectResponse,
+      returnObject,
+    }) => {
       testIfExists(callback);
       shouldBeAFunction(callback);
 
@@ -743,11 +773,10 @@ describe('Redux Utils', () => {
           shouldNotThrow(callback, okResponse);
           testIfExists(result);
           shouldBeAnObject(result);
-
-          shouldHaveKeys(result, 'data', 'meta');
+          shouldHaveKeys(result, ...keys);
 
           it('should correctly return the data property and process it', () => {
-            expect(result).to.deep.equal({ data, meta });
+            expect(result).to.deep.equal(returnObject);
           });
         });
 
@@ -756,16 +785,47 @@ describe('Redux Utils', () => {
 
           testIfExists(result);
           shouldBeAnObject(result);
-          shouldHaveKeys(result, 'data', 'meta');
-          shouldHaveKeys(result.data, 'redirect_to');
+          shouldHaveKeys(result, ...keys);
 
           it('should return the expected result', () => {
-            expect(result).to.deep.equal({
-              meta: {},
-              data: { redirect_to: url },
-            });
+            expect(result).to.deep.equal(redirectResponse);
           });
         });
+      });
+    };
+
+    describe('when passed a valid function to handle response data', () => {
+      const callback = fetchCallback(testFetchHandler);
+      const returnObject = { data, meta };
+      const redirectResponse = { meta: {}, data: { redirect_to: url } };
+
+      testCallback({
+        callback,
+        returnObject,
+        redirectResponse,
+        keys: ['data', 'meta'],
+      });
+    });
+
+    describe('when passed a valid action type string', () => {
+      const callback = fetchCallback(TEST_ACTION_TYPE);
+      const returnObject = {
+        type: TEST_ACTION_TYPE,
+        payload: data,
+        meta,
+      };
+
+      const redirectResponse = {
+        type: TEST_ACTION_TYPE,
+        payload: { redirect_to: 'http://www.testy-pants.com' },
+        meta: {},
+      };
+
+      testCallback({
+        callback,
+        returnObject,
+        redirectResponse,
+        keys: ['type', 'payload', 'meta'],
       });
     });
   });
