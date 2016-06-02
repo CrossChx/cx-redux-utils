@@ -478,7 +478,7 @@ export const statusFilter = cond([
   [statusWithinRange(200, 300), encodeResponse],
 ]);
 
-const actionCreatorOrNew = ifElse(is(Function), identity, createAction);
+export const actionCreatorOrNew = ifElse(is(Function), identity, createAction);
 const safeData = either(propOr(undefined, 'data'), identity);
 const safeMeta = propOr({}, 'meta');
 /**

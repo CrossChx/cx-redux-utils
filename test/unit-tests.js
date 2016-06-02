@@ -15,6 +15,7 @@ import {
   statusWithinRange,
 
   // Redux utils
+  actionCreatorOrNew,
   createAction,
   createThunk,
   createErrorAction,
@@ -419,6 +420,43 @@ describe('Redux Utils', () => {
         it('should retain the meta passed to it', () => {
           expect(createdAction.meta).to.deep.equal(meta);
         });
+      });
+    });
+  });
+
+  /** @name actionCreatorOrNew */
+  describe('#actionCreatorOrNew', () => {
+    const type = TEST_ACTION_TYPE;
+    const payload = 'Oh Hai Mark';
+    const expectedAction = { type, payload, meta: {} };
+
+    describe('given a valid type', () => {
+      const creator = actionCreatorOrNew(type);
+
+      testIfExists(creator);
+      shouldBeAFunction(creator);
+
+      describe(`when invoked with the string ${payload}`, () => {
+        const result = creator(payload);
+
+        testIfExists(result);
+        shouldBeAnObject(result);
+
+        it('should return the expected action object', () => {
+          expect(result).to.deep.equal(expectedAction);
+        });
+      });
+    });
+
+    describe('given a valid actionCreator', () => {
+      const creator = createAction(type);
+      const result = actionCreatorOrNew(creator);
+
+      testIfExists(result);
+      shouldBeAFunction(result);
+
+      it('should return identity', () => {
+        expect(result).to.equal(creator);
       });
     });
   });
