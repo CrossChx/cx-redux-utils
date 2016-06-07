@@ -227,7 +227,9 @@ export const createThunk = actionType =>
     ));
 
 /**
- * [createHandler description]
+ * Given any string key name, returns a function that takes a state and action and
+ * returns a copy of the action's payload property renamed as the
+ * specified key
  *
  * @function
  * @see [tests]{@link module:test~createHandler}
