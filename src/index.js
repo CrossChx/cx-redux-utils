@@ -227,6 +227,38 @@ export const createThunk = actionType =>
     ));
 
 /**
+ * [createHandler description]
+ *
+ * @function
+ * @see [tests]{@link module:test~createHandler}
+ * @param   {String}          key     name of payloads state destination key
+ * @return  {handlerFunction}         A function that ignores current state and
+ *                                    returns a copy of the action's payload
+ *                                    property renamed as the specified key
+ *
+ * @example
+ * const testHandler = createHandler('bananas');
+ * const state = {};
+ * const action = { payload: { list: [1, 2, 3, 4] } }
+ *
+ * testHandler(state, action)
+ * //=> { bananas: [1, 2, 3, 4] }
+ */
+export const createHandler = key =>
+  (state, { payload }) => ({ [key]: payload });
+
+  /**
+   * Function with a standard reducer signature of (state, action) and returns
+   * a renamed copy of the action's payload property
+   *
+   * @name handlerFunction
+   * @function
+   * @param   {Object} [state]  current state
+   * @param   {Object} [action] current action
+   * @returns {Object}          renamed action.payload
+   */
+
+/**
  * Takes an optional payload and meta object and returns an object
  * that describes a redux action to be dispatched
  *

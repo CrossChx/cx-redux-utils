@@ -18,6 +18,7 @@ import {
   actionCreatorOrNew,
   createAction,
   createThunk,
+  createHandler,
   createErrorAction,
   createErrorThunk,
   createReducer,
@@ -629,6 +630,31 @@ describe('Redux Utils', () => {
           it('should retain the message passed to it', () => {
             expect(createdActionResult).to.eventually.contain.all.keys({ message });
           });
+        });
+      });
+    });
+  });
+
+  /** @name createHandler */
+  describe('#createHandler', () => {
+    const key = 'testKey';
+
+    describe(`given the key ${key}`, () => {
+      const handler = createHandler(key);
+
+      testIfExists(handler);
+      shouldBeAFunction(handler);
+
+      describe('when the resulting function is passed a payload', () => {
+        const state = {};
+        const list = [1, 2, 3, 4];
+        const action = { payload: { list } };
+        const result = handler(state, action);
+
+        testIfExists(result);
+        shouldHaveKeys(result, key);
+        it('should form the expected addition to existing state', () => {
+          expect(result[key]).to.deep.equal({ list });
         });
       });
     });
