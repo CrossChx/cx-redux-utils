@@ -453,8 +453,22 @@ describe('Redux Utils', () => {
       shouldBeFalse(result);
     });
 
-    describe('given an empty object', () => {
+    describe('given an empty object action', () => {
       const action = {};
+      const result = actionTypeIs(action, type);
+
+      shouldBeFalse(result);
+    });
+
+    describe('given undefined action', () => {
+      const action = undefined;
+      const result = actionTypeIs(action, type);
+
+      shouldBeFalse(result);
+    });
+
+    describe('given undefined action', () => {
+      const action = null;
       const result = actionTypeIs(action, type);
 
       shouldBeFalse(result);

@@ -392,6 +392,10 @@ const safeType = propOr('', 'type');
  */
 export const actionTypeIs = converge(equals, [nthArg(1), safeType]);
 
+export const actionTypeIsC = curry(
+  (action, actionType) => compose(equals(actionType), safeType)(action)
+);
+
 /** @module lenses */
 
 /**
