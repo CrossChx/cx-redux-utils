@@ -379,6 +379,16 @@ const safeType = propOr('', 'type');
  *
  * actionTypeIs(action, 'test')
  * //=> true
+ *
+ * actionTypeIs(action, 'blah')
+ * //=> false
+ *
+ * const thunk = () => {}
+ * actionTypeIs(thunk, 'test')
+ * //=> false
+ *
+ * actionTypeIs({}, 'test')
+ * //=> false
  */
 export const actionTypeIs = converge(equals, [nthArg(1), safeType]);
 
