@@ -361,6 +361,27 @@ export const createErrorThunk = (actionType, message) =>
  * //}
  */
 
+const safeType = propOr('', 'type');
+
+/**
+ * Given an action and a type string, returns a boolean value to indicate that
+ * the action has a type property equal to to the type string
+ *
+ * @function
+ * @see [tests]{@link module:test~actionTypeIs}
+ * @param  {Object} action  standard action object
+ * @param  {String} type    any string
+ * @return {Boolean}        true if action.type === type
+ *
+ * @example
+ * const type = 'test'
+ * const action = { type }
+ *
+ * actionTypeIs(action, 'test')
+ * //=> true
+ */
+export const actionTypeIs = converge(equals, [nthArg(1), safeType]);
+
 /** @module lenses */
 
 /**

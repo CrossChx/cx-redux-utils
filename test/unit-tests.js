@@ -16,6 +16,7 @@ import {
 
   // Redux utils
   actionCreatorOrNew,
+  actionTypeIs,
   createAction,
   createThunk,
   createHandler,
@@ -34,6 +35,8 @@ import {
   shouldBeAnArray,
   shouldBeAnObject,
   shouldBeAString,
+  shouldBeFalse,
+  shouldBeTrue,
   shouldBeUndefined,
   shouldHaveKeys,
   shouldNotBeNull,
@@ -422,6 +425,39 @@ describe('Redux Utils', () => {
           expect(createdAction.meta).to.deep.equal(meta);
         });
       });
+    });
+  });
+
+  /** @name actionTypeIs */
+  describe('#actionTypeIs', () => {
+    const type = 'TYPE';
+
+    describe('given an action with a matching type', () => {
+      const action = { type };
+      const result = actionTypeIs(action, type);
+
+      shouldBeTrue(result);
+    });
+
+    describe('given an action with a non matching type', () => {
+      const action = { type: 'blah' };
+      const result = actionTypeIs(action, type);
+
+      shouldBeFalse(result);
+    });
+
+    describe('given an action that is a function', () => {
+      const action = () => {};
+      const result = actionTypeIs(action, type);
+
+      shouldBeFalse(result);
+    });
+
+    describe('given an empty object', () => {
+      const action = {};
+      const result = actionTypeIs(action, type);
+
+      shouldBeFalse(result);
     });
   });
 
