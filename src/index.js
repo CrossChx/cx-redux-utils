@@ -255,9 +255,9 @@ export const createHandler = key =>
    *
    * @name handlerFunction
    * @function
-   * @param   {Object} [state]  current state
-   * @param   {Object} [action] current action
-   * @returns {Object}          renamed action.payload
+   * @param   {Object} state  current state
+   * @param   {Object} action current action
+   * @returns {Object}        renamed action.payload
    */
 
 /**
