@@ -19,7 +19,6 @@ import {
   isEmpty,
   isNil,
   lensPath,
-  lensProp,
   lt,
   merge,
   mergeAll,
@@ -421,14 +420,12 @@ export const actionTypeIsC = curry(
  * set(cLens, 'it is party time', nestedObj)
  * //=> { a: { b: { c: 'it is party time' } } }
  */
-export const getLens = ifElse(isArrayLike, lensPath, lensProp);
+export const getLens = ifElse(isArrayLike, lensPath, compose(lensPath, of));
 
 /**
  * Create a [memoized]{@link https://en.wikipedia.org/wiki/Memoization} function
  * that finds and returns specified property of an object. Uses ramda
- * [lensProp]{@link http://ramdajs.com/0.21.0/docs/#lensProp},
  * [lensPath]{@link http://ramdajs.com/0.21.0/docs/#lensPath},
- * [memoize]{@link http://ramdajs.com/0.21.0/docs/#memoize},
  * and [view]{@link http://ramdajs.com/0.21.0/docs/#view} internally
  *
  * Pass a single string propName for top level key,

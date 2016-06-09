@@ -744,7 +744,7 @@ describe('Redux Utils', () => {
         });
 
         describe('given an undefined value', () => {
-          shouldThrow(selector, undefined, TypeError);
+          shouldNotThrow(selector, undefined);
         });
 
         describe('given an empty object the result', () => {
