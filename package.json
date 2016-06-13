@@ -19,6 +19,8 @@
     "test": "./node_modules/mocha/bin/_mocha --compilers js:babel-core/register ./test/unit-tests"
   },
   "dependencies": {
+    "chai": "^3.5.0",
+    "how-the-test-was-won": "^1.0.28",
     "ramda": "^0.21.0"
   },
   "devDependencies": {

@@ -39,6 +39,8 @@ import {
   view,
 } from 'ramda';
 
+export { default as actionTest } from './actionTest';
+
 const isNilOrEmpty = or(isNil, isEmpty);
 const notNil = compose(not, isNil);
 const notEmpty = compose(not, isEmpty);
