@@ -41,7 +41,6 @@ import {
   shouldHaveKeys,
   shouldNotBeNull,
   shouldNotThrow,
-  shouldThrow,
   testCases,
   testIfExists,
 } from 'how-the-test-was-won';
@@ -847,20 +846,20 @@ describe('Redux Utils', () => {
 
   /** @name fetchCallback */
   describe('#fetchCallback', () => {
+    const makeOkResponse = (data = {}, meta = {}) => ({
+      value: `{"data":${JSON.stringify(data)},"meta":${JSON.stringify(meta)}}`,
+      status: 200,
+    });
+
     const testFetchHandler = (data, meta) => ({ data, meta });
 
     const data = 'i am the data you seek';
     const meta = 'i am the data about the data you seek';
     const url = 'http://www.testy-pants.com';
-
-    const stringData = `"data":"${data}"`;
-    const stringMeta = `"meta":"${meta}"`;
-
-    const value = `{${stringData},${stringMeta}}`;
-    const okResponse = { value, status: 200 };
+    const okResponse = makeOkResponse(data, meta);
 
     const noAuthResponse = {
-      value,
+      value: okResponse.value,
       status: 401,
       headers: {
         get(prop) {
@@ -870,21 +869,22 @@ describe('Redux Utils', () => {
     };
 
     const testCallback = ({
-      callback,
       keys,
-      redirectResponse,
+      callback,
       returnObject,
+      responseObject,
+      redirectResponse,
     }) => {
       testIfExists(callback);
       shouldBeAFunction(callback);
-
+      console.log('resopose of ', responseObject);
       describe('when the resulting function is passed', () => {
         runErrorCases(callback);
 
         describe('a valid response object', () => {
-          const result = callback(okResponse);
+          const result = callback(responseObject);
 
-          shouldNotThrow(callback, okResponse);
+          shouldNotThrow(callback, responseObject);
           testIfExists(result);
           shouldBeAnObject(result);
           shouldHaveKeys(result, ...keys);
@@ -894,35 +894,60 @@ describe('Redux Utils', () => {
           });
         });
 
-        describe('a 401 response object with location header', () => {
-          const result = callback(noAuthResponse);
+        if (redirectResponse) {
+          describe('a 401 response object with location header', () => {
+            const result = callback(noAuthResponse);
 
-          testIfExists(result);
-          shouldBeAnObject(result);
-          shouldHaveKeys(result, ...keys);
+            testIfExists(result);
+            shouldBeAnObject(result);
+            shouldHaveKeys(result, ...keys);
 
-          it('should return the expected result', () => {
-            expect(result).to.deep.equal(redirectResponse);
+            it('should return the expected result', () => {
+              expect(result).to.deep.equal(redirectResponse);
+            });
           });
-        });
+        }
       });
     };
 
     describe('when passed a valid function to handle response data', () => {
       const callback = fetchCallback(testFetchHandler);
-      const returnObject = { data, meta };
-      const redirectResponse = { meta: {}, data: { redirect_to: url } };
 
-      testCallback({
-        callback,
-        returnObject,
-        redirectResponse,
-        keys: ['data', 'meta'],
+      describe('when passed a response with a "data" value that is', () => {
+        const keys = ['data', 'meta'];
+
+        describe('a non-empty object', () => {
+          const returnObject = { data, meta };
+          const responseObject = okResponse;
+          const redirectResponse = { meta: {}, data: { redirect_to: url } };
+
+          testCallback({
+            keys,
+            callback,
+            returnObject,
+            responseObject,
+            redirectResponse,
+          });
+        });
+
+        describe('a false boolean value', () => {
+          const returnObject = { data: false, meta: {} };
+          const responseObject = makeOkResponse(false);
+
+          testCallback({
+            keys,
+            callback,
+            returnObject,
+            responseObject,
+          });
+        });
       });
     });
 
     describe('when passed a valid action type string', () => {
       const callback = fetchCallback(TEST_ACTION_TYPE);
+      const responseObject = okResponse;
+
       const returnObject = {
         type: TEST_ACTION_TYPE,
         payload: data,
@@ -938,6 +963,7 @@ describe('Redux Utils', () => {
       testCallback({
         callback,
         returnObject,
+        responseObject,
         redirectResponse,
         keys: ['type', 'payload', 'meta'],
       });

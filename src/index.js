@@ -1,4 +1,5 @@
 import {
+  allPass,
   always,
   and,
   compose,
@@ -6,12 +7,12 @@ import {
   converge,
   curry,
   defaultTo,
-  either,
   equals,
   find,
   flip,
   fromPairs,
   gte,
+  has,
   identity,
   ifElse,
   is,
@@ -529,7 +530,7 @@ export const statusWithinRange = curry((lowestCode, hightestCode) =>
 );
 
 // Response handling support functions
-export const parse = s => JSON.parse(isEmpty(s) ? '{}' : s);
+export const parse = x => JSON.parse(isEmpty(x) ? '{}' : x);
 export const parseIfString = ifElse(typeIs('String'), parse, identity);
 export const encodeResponse = compose(parseIfString, prop('value'));
 export const getHeaders = data => data.headers.get('location');
@@ -542,7 +543,9 @@ export const statusFilter = cond([
 ]);
 
 export const actionCreatorOrNew = ifElse(is(Function), identity, createAction);
-const safeData = either(propOr(undefined, 'data'), identity);
+
+const isResponseObj = allPass([typeIs('Object'), has('data')]);
+const safeData = ifElse(isResponseObj, path(['data']), identity);
 const safeMeta = propOr({}, 'meta');
 /**
  * Returns a function that passes the value.data property expected fetch result
