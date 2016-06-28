@@ -27,6 +27,7 @@ import {
   objOf,
   of,
   or,
+  path,
   pathSatisfies,
   prop,
   propEq,
@@ -362,8 +363,6 @@ export const createErrorThunk = (actionType, message) =>
  * //}
  */
 
-const safeType = propOr('', 'type');
-
 /**
  * Given an action and a type string, returns a boolean value to indicate that
  * the action has a type property equal to to the type string
@@ -392,7 +391,7 @@ const safeType = propOr('', 'type');
  * //=> false
  */
 export const actionTypeIs = curry(
-  (action, actionType) => compose(equals(actionType), safeType)(action)
+  (action, actionType) => compose(equals(actionType), path(['type']))(action)
 );
 
 /** @module lenses */
