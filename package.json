@@ -15,8 +15,10 @@
     "docs": "npm run clean-docs && npm run build-docs",
     "prepublish": "npm run compile",
     "start": "webpack && node ./lib/bundle.js",
-    "test-watch": "./node_modules/mocha/bin/_mocha --compilers js:babel-core/register ./test/unit-tests --watch",
-    "test": "./node_modules/mocha/bin/_mocha --compilers js:babel-core/register ./test/unit-tests"
+    "test": "./node_modules/mocha/bin/_mocha --compilers js:babel-core/register ./test/unit-tests",
+    "test:watch": "npm run test -- --watch --growl",
+    "test:min": "npm run test:watch -- --reporter min",
+    "mocha:nyan": "npm run test:watch -- --reporter nyan"
   },
   "dependencies": {
     "chai": "^3.5.0",

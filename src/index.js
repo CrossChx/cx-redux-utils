@@ -391,9 +391,7 @@ const safeType = propOr('', 'type');
  * actionTypeIs({}, 'test')
  * //=> false
  */
-export const actionTypeIs = converge(equals, [nthArg(1), safeType]);
-
-export const actionTypeIsC = curry(
+export const actionTypeIs = curry(
   (action, actionType) => compose(equals(actionType), safeType)(action)
 );
 
