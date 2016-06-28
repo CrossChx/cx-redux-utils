@@ -877,7 +877,7 @@ describe('Redux Utils', () => {
     }) => {
       testIfExists(callback);
       shouldBeAFunction(callback);
-      console.log('resopose of ', responseObject);
+
       describe('when the resulting function is passed', () => {
         runErrorCases(callback);
 
