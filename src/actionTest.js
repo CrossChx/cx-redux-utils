@@ -26,8 +26,8 @@ export default (defaultState, reducer) => ({
   creator,
   payload,
   type,
-  expectedObj,
   payloadReassignKey,
+  expectedObj = {},
   meta = {},
 }) => {
   describe(`given a valid ${name} action`, () => {
