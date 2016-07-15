@@ -27,6 +27,7 @@ export default (defaultState, reducer) => ({
   payload,
   type,
   expectedObj,
+  payloadReassignKey,
   meta = {},
 }) => {
   describe(`given a valid ${name} action`, () => {
@@ -43,7 +44,11 @@ export default (defaultState, reducer) => ({
       });
     });
 
-    const expected = { ...defaultState, ...expectedObj };
+    const expectedResult = payloadReassignKey
+      ? { [payloadReassignKey]: payload }
+      : expectedObj;
+
+    const expected = { ...defaultState, ...expectedResult };
     const expectedKeys = Object.keys(expected);
     const result = reducer(defaultState, action);
 
