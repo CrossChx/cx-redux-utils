@@ -988,6 +988,9 @@ describe('Redux Utils', () => {
   /** @name queueFetch */
   namedApiFetchTest('queue');
 
+  /** @name companyFetch */
+  namedApiFetchTest('company');
+
   /** @name umsFetch */
   namedApiFetchTest('ums');
 
