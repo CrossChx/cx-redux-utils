@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import {
   allPass,
   always,
@@ -755,14 +756,29 @@ export const queueFetch = namedApiFetchWrapper('queue');
 /**
  * Takes a url and [params object]{@link module:fetch~ParamsObject} like the
  * [standard fetch action creator]{@link https://goo.gl/b3P3BJ}, but
- * adds a url prefix and headers for ums api
+ * adds a url prefix and headers for company api
  *
  * @function
  * @param  {String} url             fetch call is sent to this url
  * @param  {ParamsObject} params    A standard [params object]{@link module:fetch~ParamsObject}
  * @return {FetchAction}            A standard [fetch action object]{@link module:fetch~FetchAction}
- *                                  with url prefix and headers for ums api
+ *                                  with url prefix and headers for company api
  */
+
+export const companyFetch = namedApiFetchWrapper('company');
+
+ /**
+  * Takes a url and [params object]{@link module:fetch~ParamsObject} like the
+  * [standard fetch action creator]{@link https://goo.gl/b3P3BJ}, but
+  * adds a url prefix and headers for ums api
+  *
+  * @function
+  * @param  {String} url             fetch call is sent to this url
+  * @param  {ParamsObject} params    A standard [params object]{@link module:fetch~ParamsObject}
+  * @return {FetchAction}            A standard [fetch action object]{@link module:fetch~FetchAction}
+  *                                  with url prefix and headers for ums api
+  */
+
 export const umsFetch = namedApiFetchWrapper('ums');
 
 /**
@@ -810,6 +826,7 @@ export default {
   issueFetch,
   encounterFetch,
   queueFetch,
+  companyFetch,
   umsFetch,
   crosswayFetch,
 };
