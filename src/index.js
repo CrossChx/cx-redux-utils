@@ -767,6 +767,20 @@ export const queueFetch = namedApiFetchWrapper('queue');
 
 export const companyFetch = namedApiFetchWrapper('company');
 
+/**
+ * Takes a url and [params object]{@link module:fetch~ParamsObject} like the
+ * [standard fetch action creator]{@link https://goo.gl/b3P3BJ}, but
+ * adds a url prefix and headers for biometrics api
+ *
+ * @function
+ * @param  {String} url             fetch call is sent to this url
+ * @param  {ParamsObject} params    A standard [params object]{@link module:fetch~ParamsObject}
+ * @return {FetchAction}            A standard [fetch action object]{@link module:fetch~FetchAction}
+ *                                  with url prefix and headers for company api
+ */
+
+export const biometricFetch = namedApiFetchWrapper('biometric');
+
  /**
   * Takes a url and [params object]{@link module:fetch~ParamsObject} like the
   * [standard fetch action creator]{@link https://goo.gl/b3P3BJ}, but
@@ -827,6 +841,7 @@ export default {
   encounterFetch,
   queueFetch,
   companyFetch,
+  biometricFetch,
   umsFetch,
   crosswayFetch,
 };
