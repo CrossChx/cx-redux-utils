@@ -1003,6 +1003,12 @@ describe('Redux Utils', () => {
   /** @name queueFetch */
   namedApiFetchTest('queue');
 
+  /** @name companyFetch */
+  namedApiFetchTest('company');
+
+  /** @name biometricFetch */
+  namedApiFetchTest('biometric');
+
   /** @name umsFetch */
   namedApiFetchTest('ums');
 
