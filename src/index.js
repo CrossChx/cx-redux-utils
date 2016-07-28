@@ -252,16 +252,36 @@ export const createThunk = actionType =>
 export const createHandler = key =>
   (state, { payload }) => ({ [key]: payload });
 
-  /**
-   * Function with a standard reducer signature of (state, action) and returns
-   * a renamed copy of the action's payload property
-   *
-   * @name handlerFunction
-   * @function
-   * @param   {Object} state  current state
-   * @param   {Object} action current action
-   * @returns {Object}        renamed action.payload
-   */
+/**
+ * Often a handler will have no need for the `state` value that is passed by
+ * convention as the first arg to a handler function, or any key on the
+ * action object other than `payload`. This function simply returns
+ * the `payload` key of the second arg that is passed to it.
+ *
+ * @function
+ * @param  {Object} state   current state of app (always ignored)
+ * @param  {Object} action  the action being handled
+ * @return {*}              the `payload` key of `action`
+ *
+ * @example
+ * const uppercasePayload = compose(toUpper, getPayload)
+ *
+ * const action = { payload: 'i drink coffee please', type: 'COFFEE_ACTION' }
+ * const state = { a: 1, b: 2, c: 3 }
+ * uppercasePayload(state, action) //=> 'I DRINK COFFEE PLEASE'
+ */
+export const getPayload = compose(prop('payload'), nthArg(1));
+
+/**
+ * Function with a standard reducer signature of (state, action) and returns
+ * a renamed copy of the action's payload property
+ *
+ * @name handlerFunction
+ * @function
+ * @param   {Object} state  current state
+ * @param   {Object} action current action
+ * @returns {Object}        renamed action.payload
+ */
 
 /**
  * Takes an optional payload and meta object and returns an object

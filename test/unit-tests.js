@@ -25,6 +25,7 @@ import {
   createReducer,
   createSelector,
   createSetter,
+  getPayload,
   fetchCallback,
   reduceReducers,
 } from '../src/index';
@@ -38,6 +39,7 @@ import {
   shouldBeFalse,
   shouldBeTrue,
   shouldBeUndefined,
+  shouldEqual,
   shouldHaveKeys,
   shouldNotBeNull,
   shouldNotThrow,
@@ -706,6 +708,19 @@ describe('Redux Utils', () => {
           expect(result[key]).to.deep.equal({ list });
         });
       });
+    });
+  });
+
+  describe('#getPayload', () => {
+    describe('given a state and action object where action has a payload', () => {
+      const payload = 'i drink coffee please';
+      const action = { payload, type: 'COFFEE_ACTION' };
+      const state = { a: 1, b: 2, c: 3 };
+      const result = getPayload(state, action);
+
+      testIfExists(result);
+      shouldBeAString(result);
+      shouldEqual(payload, result);
     });
   });
 
