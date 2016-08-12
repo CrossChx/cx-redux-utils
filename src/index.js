@@ -9,9 +9,7 @@ import {
   curry,
   defaultTo,
   equals,
-  find,
   flip,
-  fromPairs,
   gte,
   has,
   identity,
@@ -24,31 +22,23 @@ import {
   lt,
   merge,
   mergeAll,
-  not,
   nthArg,
   objOf,
   of,
   or,
   path,
-  pathSatisfies,
   prop,
   propEq,
   propOr,
   set,
-  split,
   T,
-  test,
   type,
   view,
 } from 'ramda';
 
-export { default as actionTestSuite } from './actionTest';
+export { actionTestSuite } from './actionTest';
 
 const isNilOrEmpty = or(isNil, isEmpty);
-const notNil = compose(not, isNil);
-const notEmpty = compose(not, isEmpty);
-const exists = and(notEmpty, notNil);
-
 const orEmptyObject = defaultTo({});
 
 const emptyObject = always({});
@@ -199,12 +189,11 @@ export function reduceReducers(...reducers) {
  * @param   {*}       [meta]      data to describe the payload
  * @returns {Object}              standard action object
  */
-export const returnActionResult =
-  (actionType, payload = {}, meta = {}) => ({
-    type: actionType,
-    payload: orEmptyObject(payload),
-    meta: orEmptyObject(meta),
-  });
+export const returnActionResult = (actionType, payload = {}, meta = {}) => ({
+  type: actionType,
+  payload: orEmptyObject(payload),
+  meta: orEmptyObject(meta),
+});
 
 /**
  * Given the specified type, return a function that creates an object with a
@@ -498,46 +487,6 @@ export const createSelector = compose(view, getLens);
  */
 export const createSetter = compose(set, getLens);
 
-const splitParams = split('&');
-const containsTicket = test(/ticket/);
-const makeParamObject = compose(fromPairs, of);
-const splitParamPair = compose(
-  split('='),
-  defaultTo('')
-);
-const getTicketString = compose(
-  defaultTo('ticket='),
-  find(containsTicket),
-  defaultTo([])
-);
-
-/**
- * Takes the query string portion of a url usually obtained with the
- * [search property]{@link http://www.w3schools.com/jsref/prop_loc_search.asp}
- * of js [location]{@link https://developer.mozilla.org/en-US/docs/Web/API/Location}
- * and returns an object with a `ticket` key value pair
- *
- * @function
- * @see [tests]{@link module:test~getTicket}
- * @param  {String} standard  querystring of a url (anything after '?' character)
- * @return {Object}           An object with a single key 'ticket' that contains
- *                            the ticket param value, or an empty string if no
- *                            ticket param was found in the querystring
- *
- * @example
- * const query = '?flicket=balloon&ticket=mufasa'
- * getTicket(query) //=> { ticket: 'mufasa' }
- *
- * const query = '?flicket=balloon&plicket=mufasa'
- * getTicket(query) //=> { ticket: '' }
- */
-export const getTicket = compose(
-  makeParamObject,
-  splitParamPair,
-  getTicketString,
-  splitParams
-);
-
 /** @module fetch */
 
 // Status Code evaluation support functions
@@ -629,119 +578,6 @@ export const fetchCallback = func => compose(
  * @property  {ParamsObject} params the request params for fetch call
  */
 
-/**
- * Mirror of the [redux-effects-fetch action creator]{@link https://goo.gl/bG7PO0}
- *
- * @ignore
- * @param  {String}       url     url to send request to
- * @param  {ParamsObject} params  a standard params object
- * @return {FetchAction}          [Fetch action object]{@link module:fetch~FetchAction}
- *                                with a payload that describes a [fetch]{@link https://goo.gl/DeFc1M}
- *                                call
- */
-const standardFetch = (url = '', params = {}) => ({
-  type: 'EFFECT_FETCH',
-  payload: { url, params },
-});
-
-/**
- * Returns a headers object with a specific crosschx api name
- *
- * @ignore
- * @param  {String} apiName name of the api to be used, this will be inserted
- *                          in the 'Accept' header string
- * @return {Object}         A headers object intended to be merged in with a
- *                          provided or default params object
- */
-const headersWithNamedAccept = apiName => ({
-  headers: {
-    Accept: `application/x.${apiName}-api.1+json`,
-    'Content-Type': 'application/json',
-    'cx-app': APP_NAME,
-    'cx-app-version': APP_VERSION,
-  },
-});
-
-const methodPath = ['method'];
-const setMethod = createSetter(methodPath);
-export const hasMethod = pathSatisfies(exists, methodPath);
-export const defaultMethodToGet = ifElse(hasMethod, identity, setMethod('GET'));
-export const processParams = compose(defaultMethodToGet, merge);
-
-/**
- * Manually curried function to return a redux-effects-fetch compliant action creator
- * with the name of a specific api and simplify usage from dev perspective
- *
- * @function
- * @see [tests]{@link module:namedApiFetchTest~test}
- * @param  {String}       apiName   name of the api will both prepend the url and
- *                                	add to accept header
- * @param  {String}       [suffix]  optional extension for the api name ex. `-api`
- * @param  {String}       url       contextual url for request
- * @param  {ParamsObject} params    [params object]{@link module:fetch~ParamsObject} for api
- *                                  call, body, method, etc..
- * @return {FetchAction}            [Fetch action object]{@link module:fetch~FetchAction}
- *                                  with url prefix and headers for encounter api
- *
- * @example
- * const beastFetch = namedApiFetchWrapper('test')
- *
- * beastFetch('/beasts', {
- *   method: 'POST',
- *   body: {
- *     beastType: 'manticore'
- *     researchUrl: 'https://en.wikipedia.org/wiki/Manticore',
- *   },
- * })
- * //=> {
- * //  type: 'EFFECT_FETCH',
- * //  payload: {
- * //    url: '/api/beast-api/beasts',
- * //    params: {
- * //      method: 'POST',
- * //      body: {
- * //        beastType: 'manticore'
- * //        researchUrl: 'https://en.wikipedia.org/wiki/Manticore',
- * //      },
- * //    	 headers: {
- * //    	   Accept: 'application/x.beast-api.1+json',
- * //    	   'Content-Type': 'application/json',
- * //        'cx-app': <from global namespace>,
- * //        'cx-app-version': <from global namespace>,
- * //    	 },
- * //    },
- * //  },
- * //}
- */
-export const namedApiFetchWrapper =
-  (apiName, suffix = '-api') => (url, params = {}) => {
-    const finalUrl = `/api/${apiName}${suffix}${url}`;
-    const headers = headersWithNamedAccept(apiName);
-    const finalParams = processParams(params, headers);
-
-    return standardFetch(finalUrl, finalParams);
-  };
-
-/**
- * These all take a url and [params object]{@link module:fetch~ParamsObject} like the
- * [standard fetch action creator]{@link https://goo.gl/b3P3BJ}, but add a url
- * prefix and headers for <api-name> api
- *
- * @function
- * @param  {String} url             fetch call is sent to this url
- * @param  {ParamsObject} params    A standard [params object]{@link module:fetch~ParamsObject}
- * @return {FetchAction}            A standard [fetch action object]{@link module:fetch~FetchAction}
- *                                  with url prefix and headers for <api-name> api
- */
-export const identityFetch = namedApiFetchWrapper('identity');
-export const issueFetch = namedApiFetchWrapper('issue');
-export const encounterFetch = namedApiFetchWrapper('encounter');
-export const queueFetch = namedApiFetchWrapper('queue');
-export const companyFetch = namedApiFetchWrapper('company');
-export const biometricFetch = namedApiFetchWrapper('biometric');
-export const umsFetch = namedApiFetchWrapper('ums');
-export const crosswayFetch = namedApiFetchWrapper('crossway', '');
-
 export default {
   returnActionResult,
   createAction,
@@ -752,7 +588,6 @@ export default {
   getLens,
   createSelector,
   createSetter,
-  getTicket,
   statusIs,
   statusCodeSatisfies,
   statusCodeComparator,
@@ -766,16 +601,4 @@ export default {
   getRedirect,
   statusFilter,
   fetchCallback,
-  hasMethod,
-  defaultMethodToGet,
-  processParams,
-  namedApiFetchWrapper,
-  identityFetch,
-  issueFetch,
-  encounterFetch,
-  queueFetch,
-  companyFetch,
-  biometricFetch,
-  umsFetch,
-  crosswayFetch,
 };

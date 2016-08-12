@@ -21,7 +21,7 @@ const runErrorTests = (func, action) => {
   shouldNotThrow(func, action);
 };
 
-export default (reducer, defaultState = {}) => ({
+export const actionTestSuite = (reducer, defaultState = {}) => ({
   name,
   creator,
   payload,

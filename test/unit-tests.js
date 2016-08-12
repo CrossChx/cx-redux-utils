@@ -2,12 +2,8 @@ import chai, { expect } from 'chai';
 
 import asPromised from 'chai-as-promised';
 
-import { namedApiFetchTest } from './namedApiFetchTest';
-
 import {
   // Support functions
-  getTicket,
-  hasMethod,
   parseIfString,
   statusIs,
   statusCodeLT,
@@ -98,45 +94,6 @@ describe('Support functions', () => {
     shouldNotThrow(parseIfString, null);
     shouldNotThrow(parseIfString, undefined);
     shouldNotThrow(parseIfString, '');
-  });
-
-  /** @name hasMethod */
-  describe('#hasMethod', () => {
-    testCases(hasMethod,
-      ['given undefined value at `method`', { method: undefined }, false],
-      ['given an empty object', {}, false],
-      ['given a truthy value at `method`', { method: true }, true],
-    );
-  });
-
-  /** @name getTicket */
-  describe('#getTicket', () => {
-    const querystring = '?param1=val1&param2=val2';
-    const ticketVal = 'thisIsTheFreakingTicket';
-
-    describe('given a url querystring that contains a "ticket" param', () => {
-      const result = getTicket(`${querystring}&ticket=${ticketVal}`);
-      const expected = { ticket: ticketVal };
-
-      testIfExists(result);
-      shouldBeAnObject(result);
-
-      it('should return the expected ticket value', () => {
-        expect(result).to.deep.equal(expected);
-      });
-    });
-
-    describe('given a url querystring that does not contain a "ticket" param', () => {
-      const result = getTicket(querystring);
-      const expected = { ticket: '' };
-
-      testIfExists(result);
-      shouldBeAnObject(result);
-      shouldHaveKeys(result, 'ticket');
-      it('should return a object with a "ticket" key and empty string', () => {
-        expect(result).to.deep.equal(expected);
-      });
-    });
   });
 
   describe('#statusIs', () => {
@@ -984,34 +941,4 @@ describe('Redux Utils', () => {
       });
     });
   });
-
-  /**
-   * These just test what will be the exported result of `queueFetch`, `umsFetch` etc...
-   * Mostly ensures that each api name does not cause any unforeseen string
-   * concatenating issues
-   */
-
-  /** @name identityFetch */
-  namedApiFetchTest('identity');
-
-  /** @name issueFetch */
-  namedApiFetchTest('issue');
-
-  /** @name encounterFetch */
-  namedApiFetchTest('encounter');
-
-  /** @name queueFetch */
-  namedApiFetchTest('queue');
-
-  /** @name companyFetch */
-  namedApiFetchTest('company');
-
-  /** @name biometricFetch */
-  namedApiFetchTest('biometric');
-
-  /** @name umsFetch */
-  namedApiFetchTest('ums');
-
-  /** @name umsFetch */
-  namedApiFetchTest('crossway', '');
 });
