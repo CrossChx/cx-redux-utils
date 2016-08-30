@@ -5,8 +5,12 @@
   "license": "MIT",
   "description": "Tools for reducing boilerplate while using an opinionated redux pattern",
   "main": "lib/index.js",
+  "bugs": {
+    "url": "https://github.com/crosschx/cx-redux-utils/issues"
+  },
   "repository": {
-    "type": "git"
+    "type": "git",
+    "url": "https://github.com/crosschx/cx-redux-utils/",
   },
   "scripts": {
     "build-docs": "./node_modules/.bin/jsdoc --configure .jsdoc.json --verbose",
