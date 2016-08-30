@@ -1,3 +1,5 @@
+[![NPM](https://nodei.co/npm/cx-redux-utils.png)](https://npmjs.org/package/cx-redux-utils)
+
 # cx-redux-utils
 A package for reducing boilerplate in redux applications
 
