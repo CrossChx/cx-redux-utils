@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>lenses - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-actions.html">actions</a><ul class='methods'><li data-type='method'><a href="module-actions.html#~actionCreator">actionCreator</a></li><li data-type='method'><a href="module-actions.html#~actionTypeIs">actionTypeIs</a></li><li data-type='method'><a href="module-actions.html#~createAction">createAction</a></li><li data-type='method'><a href="module-actions.html#~createErrorAction">createErrorAction</a></li><li data-type='method'><a href="module-actions.html#~createHandler">createHandler</a></li><li data-type='method'><a href="module-actions.html#~errorActionCreator">errorActionCreator</a></li><li data-type='method'><a href="module-actions.html#~getPayload">getPayload</a></li><li data-type='method'><a href="module-actions.html#~handlerFunction">handlerFunction</a></li><li data-type='method'><a href="module-actions.html#~returnActionResult">returnActionResult</a></li><li data-type='method'><a href="module-actions.html#~returnErrorResult">returnErrorResult</a></li></ul></li><li><a href="module-fetch.html">fetch</a><ul class='methods'><li data-type='method'><a href="module-fetch.html#~fetchCallback">fetchCallback</a></li></ul></li><li><a href="module-lenses.html">lenses</a><ul class='methods'><li data-type='method'><a href="module-lenses.html#~createSelector">createSelector</a></li><li data-type='method'><a href="module-lenses.html#~createSetter">createSetter</a></li><li data-type='method'><a href="module-lenses.html#~getLens">getLens</a></li></ul></li><li><a href="module-reducers.html">reducers</a><ul class='methods'><li data-type='method'><a href="module-reducers.html#~createReducer">createReducer</a></li><li data-type='method'><a href="module-reducers.html#~reduceReducers">reduceReducers</a></li></ul></li><li><a href="module-tests.html">tests</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">lenses</h1>
+    
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="~createSelector"><span class="type-signature">(inner) </span>createSelector<span class="signature">(path)</span><span class="type-signature"> &rarr; {function}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Create a <a href="https://en.wikipedia.org/wiki/Memoization">memoized</a> function
+that finds and returns specified property of an object. Uses ramda
+<a href="http://ramdajs.com/0.21.0/docs/#lensPath">lensPath</a>,
+and <a href="http://ramdajs.com/0.21.0/docs/#view">view</a> internally</p>
+<p>Pass a single string propName for top level key,
+or an array of propNames for deep nested keys</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>path</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+|
+
+<span class="param-type">Array.&lt;String></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>an array for deep prop, or string for top level</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="src_index.js.html">src/index.js</a>, <a href="src_index.js.html#line487">line 487</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><p><code>tests</code></p></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>function that returns the value of a property
+                                   at the specified path</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">function</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>const getA = createSelector('a')
+const simpleObj = { a: 'rumble in the bronx', b: 'I like turtles' }
+getA(simpleObj) //=> 'rumble in the bronx'
+
+const getC = createSelector(['a', 'b', 'c'])
+const nestedObj = { a: { b: { c: 'rumble in the bronx' } } }
+getC(nestedObj) //=> 'rumble in the bronx'</code></pre>
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~createSetter"><span class="type-signature">(inner) </span>createSetter<span class="signature">(path)</span><span class="type-signature"> &rarr; {function}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Create a <a href="https://en.wikipedia.org/wiki/Memoization">memoized</a>
+function that returns a shallow copy of a given object, plus an
+altered value according the property it is focused to. Uses ramda
+<a href="http://ramdajs.com/0.21.0/docs/#lensPath">lensPath</a>,
+and <a href="http://ramdajs.com/0.21.0/docs/#set">set</a> internally</p>
+<p>Pass a single string propName for top level key,
+or an array of propNames for deep nested keys</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>path</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+|
+
+<span class="param-type">Array.&lt;String></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>an array of strings for a deep property, or
+                                   string for top level property</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="src_index.js.html">src/index.js</a>, <a href="src_index.js.html#line517">line 517</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><p><code>tests</code></p></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>function that returns a clone of an object with a new
+                                   value set to the property at the specified path</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">function</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>const newVal = 'it is party time'
+
+const setA = createSetter('a')
+const obj = { a: 'I am bored', b: 'I like turtles' }
+setA(newVal, obj) //=> { a: 'it is party time', b: 'I like turtles' }
+
+const setC = createSetter(['a', 'b', 'c'])
+const obj = { a: { b: { c: 'I am bored' } } }
+setC(newVal, obj) //=> { a: { b: { c: 'it is party time' } } }</code></pre>
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~getLens"><span class="type-signature">(inner) </span>getLens<span class="signature">(path)</span><span class="type-signature"> &rarr; {function}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Wraps ramda's <a href="http://ramdajs.com/0.21.0/docs/#lensProp">lensProp</a> and
+<a href="http://ramdajs.com/0.21.0/docs/#lensPath">lensPath</a> to return a lens
+that focuses on a top level property if passed a string, and a deep property
+if passed an array of strings for propPath</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>path</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+|
+
+<span class="param-type">Array.&lt;String></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>an array for deep prop, or string for top level</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="src_index.js.html">src/index.js</a>, <a href="src_index.js.html#line460">line 460</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><p><code>tests</code></p></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">function</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>import { view, set } from 'ramda'
+
+const aLens = getLens('a')
+const simpleObj = { a: 'rumble in the bronx', b: 'I like turtles' }
+view(aLens, simpleObj) //=> 'rumble in the bronx'
+
+const cLens = getLens(['a', 'b', 'c'])
+const nestedObj = { a: { b: { c: 'I am bored' } } }
+set(cLens, 'it is party time', nestedObj)
+//=> { a: { b: { c: 'it is party time' } } }</code></pre>
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Tue Aug 30 2016 11:52:40 GMT-0400 (EDT) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

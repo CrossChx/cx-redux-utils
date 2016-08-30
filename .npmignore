@@ -1,9 +1,0 @@
-# Source dir
-test
-
-# Config files
-.babelrc
-.gitignore
-.jsbeautifyrc
-.eslintignore
-.eslintrc.js
