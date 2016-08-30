@@ -13,3 +13,23 @@ npm i -S cx-redux-utils
 
 # Documentation
 See [docs](https://crosschx.github.io/cx-redux-utils/) you are obviously smart :)
+
+# Contributing
+
+## Get Started
+```shell
+git clone https://github.com/crosschx/cx-redux-utils
+cd cx-redux-utils
+```
+
+Now just make amazing improvements in ./src/index.js, please:
+
+  - add tests to test/unit-tests.js
+  - add examples and meta info for new functions to doc blocks according to [jsdoc docs](http://usejsdoc.org/)
+
+## Build and view the docs locally
+```shell
+npm i
+npm run docs
+open ./docs/cx-redux-utils/<version>/index.html
+```
