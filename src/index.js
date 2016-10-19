@@ -8,6 +8,7 @@ import {
   converge,
   curry,
   defaultTo,
+  either,
   equals,
   flip,
   gte,
@@ -509,7 +510,7 @@ export const getRedirect = compose(objOf('redirect_to'), getHeaders);
 export const statusFilter = cond([
   [isNilOrEmpty, emptyObject],
   [statusIs(401), getRedirect],
-  [statusWithinRange(200, 300), encodeResponse],
+  [either(statusWithinRange(200, 300), has('value')), encodeResponse],
 ]);
 
 export const actionCreatorOrNew = ifElse(is(Function), identity, createAction);
